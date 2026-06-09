@@ -1,2 +1,5 @@
 .vscode/
 .DS_Store
+.luarc.json
+avatar.code-workspace
+animation_mirror/debug_overrides.lua
