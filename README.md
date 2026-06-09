@@ -1,0 +1,1 @@
+# figura_mc_animation_mirror
