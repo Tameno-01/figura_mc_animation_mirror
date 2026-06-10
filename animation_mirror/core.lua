@@ -1,6 +1,4 @@
-pcall(require, "./debug_overrides")
-
-log("If you see this log, lmk")
+local Utils = require("./core_utils")
 
 local api = {}
 
@@ -8,15 +6,10 @@ local current_state = "OFF"
 local source_player_uuid = nil
 local state_change_functions = {}
 local source_change_functions = {}
-local body
+local body = nil
 
-local function source_render()
-	
-end
-
-local function copying_render()
-
-end
+-- this function will be given a body later in this script
+local stop_copying
 
 local function change_state(to)
 	local from = current_state
@@ -26,12 +19,57 @@ local function change_state(to)
 	end
 end
 
+local function source_render()
+	local pose = body.get_pose()
+	local avar = {}
+	Utils.add_mat4_to_avar("head", pose, avar)
+	Utils.add_mat4_to_avar("left_arm", pose, avar)
+	Utils.add_mat4_to_avar("right_arm", pose, avar)
+	Utils.add_mat4_to_avar("hips", pose, avar)
+	Utils.add_mat4_to_avar("left_leg", pose, avar)
+	Utils.add_mat4_to_avar("right_leg", pose, avar)
+	Utils.add_vec_to_avar("torso_ik_target", pose, avar)
+	Utils.add_vec_to_avar("left_arm_ik_target", pose, avar)
+	Utils.add_vec_to_avar("right_arm_ik_target", pose, avar)
+	Utils.add_vec_to_avar("left_leg_ik_target", pose, avar)
+	Utils.add_vec_to_avar("right_leg_ik_target", pose, avar)
+	avatar:store("AnimationMirror_pose", avar)
+end
+
+local function copying_render()
+	local avars = world.avatarVars()[source_player_uuid]
+	if avars == nil then
+		stop_copying()
+		change_state("OFF")
+		return
+	end
+	local avar = avars.AnimationMirror_pose
+	if avar == nil or type(avar) ~= "table" then
+		stop_copying()
+		change_state("OFF")
+		return
+	end
+	local pose = {}
+	Utils.add_mat4_from_avar("head", avar, pose)
+	Utils.add_mat4_from_avar("left_arm", avar, pose)
+	Utils.add_mat4_from_avar("right_arm", avar, pose)
+	Utils.add_mat4_from_avar("hips", avar, pose)
+	Utils.add_mat4_from_avar("left_leg", avar, pose)
+	Utils.add_mat4_from_avar("right_leg", avar, pose)
+	Utils.add_vec_from_avar("torso_ik_target", avar, pose)
+	Utils.add_vec_from_avar("left_arm_ik_target", avar, pose)
+	Utils.add_vec_from_avar("right_arm_ik_target", avar, pose)
+	Utils.add_vec_from_avar("left_leg_ik_target", avar, pose)
+	Utils.add_vec_from_avar("right_leg_ik_target", avar, pose)
+	body.apply_pose(pose)
+end
+
 local function begin_being_source()
-	events.RENDER:register(source_render)
+	body.root.postRender = source_render
 end
 
 local function stop_being_source()
-	events.RENDER:remove(source_render)
+	body.root.postRender = nil
 	avatar:store("AnimationMirror_pose", nil)
 end
 
@@ -67,12 +105,16 @@ local function begin_copying(player_uuid)
 	end
 end
 
-local function stop_copying()
+-- "local" is missing because we declared "stop_copying" earlier
+function stop_copying()
 	events.RENDER:remove(copying_render)
 	avatar:store("AnimationMirror_source", nil)
 end
 
 function api.begin_being_source()
+	if body == nil then
+		error("AnimationMirror: No body was provided")
+	end
 	if current_state == "SOURCE" then
 		return
 	elseif current_state == "COPYING" then
@@ -83,6 +125,9 @@ function api.begin_being_source()
 end
 
 function api.begin_copying(player_uuid)
+	if body == nil then
+		error("AnimationMirror: No body was provided")
+	end
 	if not can_copy(player_uuid) then
 		return false
 	elseif current_state == "SOURCE" then
