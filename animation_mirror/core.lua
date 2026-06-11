@@ -22,12 +22,13 @@ end
 local function source_render()
 	local pose = body.get_pose()
 	local avar = {}
-	Utils.add_mat4_to_avar("head", pose, avar)
-	Utils.add_mat4_to_avar("left_arm", pose, avar)
-	Utils.add_mat4_to_avar("right_arm", pose, avar)
+	Utils.add_mat3_to_avar("head", pose, avar)
+	Utils.add_mat4_to_avar("torso_top", pose, avar)
 	Utils.add_mat4_to_avar("hips", pose, avar)
-	Utils.add_mat4_to_avar("left_leg", pose, avar)
-	Utils.add_mat4_to_avar("right_leg", pose, avar)
+	Utils.add_mat4_to_avar("left_hand", pose, avar)
+	Utils.add_mat4_to_avar("right_hand", pose, avar)
+	Utils.add_mat4_to_avar("left_foot", pose, avar)
+	Utils.add_mat4_to_avar("right_foot", pose, avar)
 	Utils.add_vec_to_avar("torso_ik_target", pose, avar)
 	Utils.add_vec_to_avar("left_arm_ik_target", pose, avar)
 	Utils.add_vec_to_avar("right_arm_ik_target", pose, avar)
@@ -50,12 +51,13 @@ local function copying_render()
 		return
 	end
 	local pose = {}
-	Utils.add_mat4_from_avar("head", avar, pose)
-	Utils.add_mat4_from_avar("left_arm", avar, pose)
-	Utils.add_mat4_from_avar("right_arm", avar, pose)
+	Utils.add_mat3_from_avar("head", avar, pose)
+	Utils.add_mat4_from_avar("torso_top", avar, pose)
 	Utils.add_mat4_from_avar("hips", avar, pose)
-	Utils.add_mat4_from_avar("left_leg", avar, pose)
-	Utils.add_mat4_from_avar("right_leg", avar, pose)
+	Utils.add_mat4_from_avar("left_hand", avar, pose)
+	Utils.add_mat4_from_avar("right_hand", avar, pose)
+	Utils.add_mat4_from_avar("left_foot", avar, pose)
+	Utils.add_mat4_from_avar("right_foot", avar, pose)
 	Utils.add_vec_from_avar("torso_ik_target", avar, pose)
 	Utils.add_vec_from_avar("left_arm_ik_target", avar, pose)
 	Utils.add_vec_from_avar("right_arm_ik_target", avar, pose)
@@ -71,16 +73,6 @@ end
 local function stop_being_source()
 	body.root.postRender = nil
 	avatar:store("AnimationMirror_pose", nil)
-end
-
-local function can_copy(player_uuid)
-	local player_vars = world.avatarVars()[player_uuid]
-	if player_vars.AnimationMirror_pose ~= nil then
-		return true
-	elseif player_vars.AnimationMirror_source ~= nil then
-		return true
-	end
-	return false
 end
 
 local function begin_copying(player_uuid)
@@ -124,11 +116,21 @@ function api.begin_being_source()
 	change_state("SOURCE")
 end
 
+function api:can_copy(player_uuid)
+	local player_vars = world.avatarVars()[player_uuid]
+	if player_vars.AnimationMirror_pose ~= nil then
+		return true
+	elseif player_vars.AnimationMirror_source ~= nil then
+		return true
+	end
+	return false
+end
+
 function api.begin_copying(player_uuid)
 	if body == nil then
 		error("AnimationMirror: No body was provided")
 	end
-	if not can_copy(player_uuid) then
+	if not api.can_copy(player_uuid) then
 		return false
 	elseif current_state == "SOURCE" then
 		stop_being_source()
@@ -148,6 +150,10 @@ function api.stop()
 		stop_copying()
 	end
 	change_state("OFF")
+end
+
+function api.get_current_state()
+	return current_state
 end
 
 function api.get_source_player_uuid()
