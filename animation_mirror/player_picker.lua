@@ -2,31 +2,30 @@ local AnimationMirror = require("./core")
 
 local api = {}
 
-function pings.AnimationMirror_player_picked(uuid)
-	AnimationMirror.begin_copying(uuid)
-end
-
 function api.pick_player()
 	if not host:isHost() then
-		return false, "NOT_HOST"
+		return nil, "NOT_HOST"
 	end
-	local start_pos = client:getCameraPos()
-	local end_pos = start_pos + client:getCameraDir() * host:getReachDistance()
+	if not player:isLoaded() then
+		return nil, "PLAYER_NOT_LOADED"
+	end
+	local start_pos = player:getPos()
+	start_pos.y = start_pos.y + player:getEyeHeight()
+	local end_pos = start_pos + player:getLookDir() * host:getReachDistance()
 	local entity, _ = raycast:entity(start_pos, end_pos, function(entity)
 		return entity ~= player
 	end)
 	if entity == nil then
-		return false, "NO_ENTITY"
+		return nil, "NO_ENTITY"
 	end
 	if not entity:isPlayer() then
-		return false, "NOT_PLAYER", entity
+		return nil, "NOT_PLAYER", entity
 	end
 	local uuid = entity:getUUID()
-	if not AnimationMirror:can_copy(uuid) then
-		return false, "NOT_COPYABLE", entity
+	if not AnimationMirror.can_copy(uuid) then
+		return nil, "NOT_COPYABLE", entity
 	end
-	pings.AnimationMirror_player_picked(uuid)
-	return true
+	return uuid
 end
 
 return api
