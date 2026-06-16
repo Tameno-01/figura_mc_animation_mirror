@@ -23,8 +23,10 @@ function api.make(
 			{
 				part = lower,
 				angle_multiplier = 1,
-				leaf_twist = 1,
+				leaf_twist = 0.75,
 				leaf_twist_vect = vec(1, 0, 0),
+				bend_twist = 0.5,
+				bend_twist_vect = vec(0, 0, -1),
 			},
 		},
 		{
