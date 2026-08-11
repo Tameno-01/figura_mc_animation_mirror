@@ -34,27 +34,30 @@ function api.make(
 		hand_pose_mat_z:normalized()
 	)
 	local inv_hand_pose_mat = hand_pose_mat:inverted()
+	local up = hand_pose_mat:getColumn(2)
 	local ik_params = Utils.precompute_ik_params(
 		{
 			{
 				part = upper,
 				leaf_twist = 0.25,
-				leaf_twist_vect = vec(0, 0, 1),
+				leaf_twist_vect = up,
 				bend_twist = 0.5,
 				bend_twist_vect = vec(0, 0, 1),
 			},
 			{
 				part = lower,
 				angle_multiplier = 1,
-				leaf_twist = 0.75,
-				leaf_twist_vect = vec(0, 0, 1),
-				bend_twist = 0.5,
+				leaf_twist = 0.66,
+				leaf_twist_vect = up,
+				bend_twist = 0.3,
 				bend_twist_vect = vec(0, 0, 1),
 			},
 		},
 		{
 			leaf = hand:getPivot(),
-			start_dir = ik_start_dir
+			leaf_twist_vect = vec(0, 1, 0),
+			leaf_forward_vect = ik_start_dir,
+			start_dir = ik_start_dir,
 		}
 	)
 	local output = {}
@@ -74,7 +77,7 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose, root, start)
-		Utils.do_ik(ik_params, pose[hand_name]:getColumn(4).xyz, pose[bend_target_name], pose[hand_name]:getColumn(3).xyz, root)
+		Utils.do_ik(ik_params, pose[hand_name], pose[bend_target_name], root)
 		local hand_parent_mat = Utils.get_root_space_mat_raw(hand:getParent(), root):deaugmented()
 		Utils.set_part_mat(hand, (hand_parent_mat:inverted() * (pose[hand_name]:deaugmented() * inv_hand_pose_mat)):augmented())
 	end

@@ -15,18 +15,25 @@ function api.make(
 	for i, v in ipairs(spine) do
 		rest_poses[i] = v:getPositionMatrix()
 	end
+	local accumulated_twist = 0
 	local sections = {}
 	for i, part in ipairs(spine) do
-		local leaf_twist = (i - 1) / (spine_count - 1)
+		local ideal_twist = (i - 1) / (spine_count - 1)
+		local ideal_difference = 1 - ideal_twist
+		local actual_difference = 1 - accumulated_twist
+		local leaf_twist = 1 - ideal_difference / actual_difference
 		sections[i] = {
 			part = part,
 			angle_multiplier = 1,
 			leaf_twist = leaf_twist,
 			leaf_twist_vect = vec(1, 0, 0),
 		}
+		accumulated_twist = accumulated_twist + leaf_twist
 	end
 	local ik_params = Utils.precompute_ik_params(sections, {
 		leaf = neck:getPivot(),
+		leaf_twist_vect = vec(1, 0, 0),
+		leaf_forward_vect = vec(0, 1, 0),
 		keep_pos = true,
 	})
 	local output = {}
@@ -47,7 +54,7 @@ function api.make(
 	function output.apply_pose(pose, root, offsets)
 		local parent_mat = Utils.get_root_space_mat_raw(spine[1]:getParent(), root)
 		Utils.set_part_mat(spine[1], parent_mat:inverted() * (pose.hips:copy():translate(-spine[1]:getPivot())))
-		Utils.do_ik(ik_params, pose.torso_top:getColumn(4).xyz, pose.torso_bend_target, pose.torso_top:getColumn(1).xyz, root)
+		Utils.do_ik(ik_params, pose.torso_top, pose.torso_bend_target, root)
 		local starts = {}
 		starts.head = matrices.mat4()
 		starts.left_arm = matrices.mat4()

@@ -73,11 +73,11 @@ local function copying_render()
 end
 
 local function begin_being_source()
-	body.root.postRender = source_render
+	events.POST_RENDER:register(source_render)
 end
 
 local function stop_being_source()
-	body.root.postRender = nil
+	events.POST_RENDER:remove(source_render)
 	avatar:store("AnimationMirror_pose", nil)
 end
 

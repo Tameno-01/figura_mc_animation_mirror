@@ -16,21 +16,23 @@ function api.make(
 			{
 				part = upper,
 				leaf_twist = 0.25,
-				leaf_twist_vect = vec(1, 0, 0),
+				leaf_twist_vect = vec(0, 0, -1),
 				bend_twist = 0.5,
 				bend_twist_vect = vec(0, 0, -1),
 			},
 			{
 				part = lower,
 				angle_multiplier = 1,
-				leaf_twist = 0.75,
-				leaf_twist_vect = vec(1, 0, 0),
-				bend_twist = 0.5,
+				leaf_twist = 0.66,
+				leaf_twist_vect = vec(0, 0, -1),
+				bend_twist = 0.3,
 				bend_twist_vect = vec(0, 0, -1),
 			},
 		},
 		{
 			leaf = foot:getPivot(),
+			leaf_twist_vect = vec(0, 0, -1),
+			leaf_forward_vect = vec(0, -1, 0),
 		}
 	)
 	local foot_name
@@ -50,7 +52,7 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose, root, start)
-		Utils.do_ik(ik_params, pose[foot_name]:getColumn(4).xyz, pose[bend_target_name], pose[foot_name]:getColumn(1).xyz, root)
+		Utils.do_ik(ik_params, pose[foot_name], pose[bend_target_name], root)
 		local hand_parent_mat = Utils.get_root_space_mat_raw(foot:getParent(), root)
 		Utils.set_part_mat(foot, (hand_parent_mat:deaugmented():inverted() * pose[foot_name]:deaugmented()):augmented())
 	end
