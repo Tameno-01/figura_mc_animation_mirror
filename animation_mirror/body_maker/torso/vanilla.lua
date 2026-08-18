@@ -10,9 +10,11 @@ function api.make(
 )
 	local torso_rest_mat = torso:getPositionMatrix()
 	height = height or 12
+	local torso_to_middle_vec
 	local output = {}
 	if bottom_pivot then
-		bend_target_vec = bend_target_vec or vec(0, 6, 1)
+		bend_target_vec = bend_target_vec or vec(0, height / 2, 1)
+		torso_to_middle_vec = vec(0, -height / 2, 0)
 		function output.get_pose(root)
 			local pose = {}
 			local torso_mat = Utils.get_root_space_mat_raw(torso, root)
@@ -23,11 +25,15 @@ function api.make(
 			pose.bend_target = torso_mat:apply(bend_target_vec)
 			return pose
 		end
-		function output.get_neck_pivot()
+		function output.get_top_pivot()
 			return torso:getPivot() + vec(0, height, 0)
 		end
+		function output.get_hips_pivot()
+			return torso:getPivot()
+		end
 	else
-		bend_target_vec = bend_target_vec or vec(0, -6, 1)
+		bend_target_vec = bend_target_vec or vec(0, -height / 2, 1)
+		torso_to_middle_vec = vec(0, height / 2, 0)
 		function output.get_pose(root)
 			local pose = {}
 			local torso_mat = Utils.get_root_space_mat_raw(torso, root)
@@ -38,15 +44,28 @@ function api.make(
 			pose.bend_target = torso_mat:apply(bend_target_vec)
 			return pose
 		end
-		function output.get_neck_pivot()
+		function output.get_top_pivot()
 			return torso:getPivot()
+		end
+		function output.get_hips_pivot()
+			return torso:getPivot() + vec(0, -height, 0)
 		end
 	end
 	function output.apply_pose(pose, root)
-		--TODO
+		local middle = (pose.hips:getColumn(4).xyz + pose.torso_top:getColumn(4).xyz) / 2
+		local y = (pose.torso_top:getColumn(4).xyz - pose.hips:getColumn(4).xyz):normalized()
+		local z = (pose.hips:getColumn(3).xyz + pose.torso_top:getColumn(3).xyz) / 2
+		local x = Utils.perpendicular(y, z)
+		z = Utils.perpendicular(x, y)
+		local torso_mat3 = matrices.mat3(x, y, z)
+		local torso_mat = torso_mat3:augmented():translate(middle + torso_mat3 * torso_to_middle_vec)
+		local parent = Utils.get_root_space_mat_raw(torso:getParent(), root)
+		torso_mat:translate(-torso:getPivot())
+		torso_mat = parent:inverted() * torso_mat
+		Utils.set_part_mat(torso, torso_mat)
 	end
 	function output.reset_pose()
-		upper:setMatrix(torso_rest_mat)
+		torso:setMatrix(torso_rest_mat)
 	end
 	return output
 end

@@ -51,7 +51,7 @@ function api.make(
 		pose.foot = Utils.get_root_space_mat_raw(foot, root)
 		return pose
 	end
-	function output.apply_pose(pose, root, start)
+	function output.apply_pose(pose, root)
 		Utils.do_ik(ik_params, pose[foot_name], pose[bend_target_name], root)
 		local hand_parent_mat = Utils.get_root_space_mat_raw(foot:getParent(), root)
 		Utils.set_part_mat(foot, (hand_parent_mat:deaugmented():inverted() * pose[foot_name]:deaugmented()):augmented())

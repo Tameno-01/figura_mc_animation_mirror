@@ -4,12 +4,43 @@ local api = {}
 
 local current_state = "OFF"
 local source_player_uuid = nil
+local current_pose = nil
+local pose_getter = nil
 local state_change_functions = {}
 local source_change_functions = {}
 local body = nil
 
 -- this function will be given a body later in this script
 local stop_copying
+
+local function set_pose_getter(value)
+	if type(value) ~= "function" then
+		return
+	end
+	pose_getter = value
+end
+
+local function get_pose()
+	if current_pose == nil then
+		return nil
+	end
+	return Utils.deep_copy_tbl(current_pose)
+end
+
+local function send_pose_getter(to)
+	if current_pose == nil then
+		return
+	end
+	local vars = world.avatarVars()[to]
+	if vars == nil then
+		return
+	end
+	local setter_of_pose_getter = vars.AnimationMirror_set_pose_getter
+	if type(setter_of_pose_getter) ~= "function" then
+		return
+	end
+	pcall(setter_of_pose_getter, get_pose)
+end
 
 local function change_state(to)
 	local from = current_state
@@ -40,17 +71,16 @@ local function source_render()
 	Utils.add_vec_to_avar("right_arm_bend_target", pose, avar, inv_scale)
 	Utils.add_vec_to_avar("left_leg_bend_target", pose, avar, inv_scale)
 	Utils.add_vec_to_avar("right_leg_bend_target", pose, avar, inv_scale)
-	avatar:store("AnimationMirror_pose", avar)
+	current_pose = avar
 end
 
 local function copying_render()
-	local avars = world.avatarVars()[source_player_uuid]
-	if avars == nil then
+	local success, avar = pcall(pose_getter)
+	if not success then
 		stop_copying()
 		change_state("OFF")
 		return
 	end
-	local avar = avars.AnimationMirror_pose
 	if type(avar) ~= "table" then
 		stop_copying()
 		change_state("OFF")
@@ -73,24 +103,39 @@ local function copying_render()
 end
 
 local function begin_being_source()
+	avatar:store("AnimationMirror_send_pose_getter", send_pose_getter)
 	events.POST_RENDER:register(source_render)
 end
 
 local function stop_being_source()
+	current_pose = nil
+	avatar:store("AnimationMirror_send_pose_getter", nil)
 	events.POST_RENDER:remove(source_render)
-	avatar:store("AnimationMirror_pose", nil)
 end
 
 local function begin_copying(uuid)
 	local prev_source_player_uuid = source_player_uuid
 	local player_vars = world.avatarVars()[uuid]
-	if player_vars.AnimationMirror_pose == nil then
-		source_player_uuid = player_vars.AnimationMirror_source
-	else
+	source_player_uuid = player_vars.AnimationMirror_source
+	if source_player_uuid == nil then
 		source_player_uuid = uuid
 	end
 	if prev_source_player_uuid == source_player_uuid then
-		return
+		return false
+	end
+	player_vars = world.avatarVars()[source_player_uuid]
+	if player_vars == nil then
+		return false
+	end
+	local pose_getter_sender = player_vars.AnimationMirror_send_pose_getter
+	if type(pose_getter_sender) ~= "function" then
+		return false
+	end
+	avatar:store("AnimationMirror_set_pose_getter", set_pose_getter)
+	pcall(pose_getter_sender, player:getUUID())
+	avatar:store("AnimationMirror_set_pose_getter", nil)
+	if pose_getter == nil then
+		return false
 	end
 	if prev_source_player_uuid == nil then
 		events.RENDER:register(copying_render)
@@ -101,11 +146,13 @@ local function begin_copying(uuid)
 			func(prev_source_player_uuid, source_player_uuid)
 		end
 	end
+	return true
 end
 
 -- "local" is missing because we declared "stop_copying" earlier
 function stop_copying()
 	source_player_uuid = nil
+	pose_getter = nil
 	events.RENDER:remove(copying_render)
 	avatar:store("AnimationMirror_source", nil)
 end
@@ -135,9 +182,9 @@ function api.can_copy(uuid)
 	if player_vars == nil then
 		return false
 	end
-	if player_vars.AnimationMirror_pose ~= nil then
+	if type(player_vars.AnimationMirror_source) == "string" then
 		return true
-	elseif player_vars.AnimationMirror_source ~= nil then
+	elseif type(player_vars.AnimationMirror_send_pose_getter) == "function" then
 		return true
 	end
 	return false
@@ -152,7 +199,10 @@ function api.begin_copying(uuid)
 	elseif current_state == "SOURCE" then
 		stop_being_source()
 	end
-	begin_copying(uuid)
+	if not begin_copying(uuid) then
+		change_state("OFF")
+		return false
+	end
 	change_state("COPYING")
 	return true
 end

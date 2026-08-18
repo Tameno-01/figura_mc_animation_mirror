@@ -12,8 +12,9 @@ function api.make(
 		pose.head = Utils.get_root_space_mat_raw(head, root):deaugmented()
 		return pose
 	end
-	function output.apply_pose(pose, root, start)
-		--TODO
+	function output.apply_pose(pose, root)
+		local parent_mat = Utils.get_root_space_mat_raw(head:getParent(), root):deaugmented()
+		Utils.set_part_mat(head, (parent_mat:inverted() * pose.head):augmented())
 	end
 	function output.reset_pose()
 		head:setMatrix(head_rest_mat)

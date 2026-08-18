@@ -5,19 +5,26 @@ local api = {}
 function api.make(
 	leg,
 	is_right,
-	foot_vec,
+	height,
 	knee_vec
 )
+	height = height or 11
 	local leg_rest_mat = leg:getPositionMatrix()
-	local leg_name
+	local bend_target_name
+	local foot_name
 	if is_right then
-		leg_name = "right_leg"
+		bend_target_name = "right_leg_bend_target"
+		foot_name = "right_foot"
 	else
-		leg_name = "left_leg"
+		bend_target_name = "left_leg_bend_target"
+		foot_name = "left_foot"
 	end
-	foot_vec = foot_vec or vec(0, -11, 0)
-	knee_vec = knee_vec or vec(0, -4.5, -1)
+	local foot_vec = vec(0, -height, 0)
+	knee_vec = knee_vec or vec(0, -height / 2, -1)
 	local output = {}
+	function output.get_offset(hips)
+		return leg:getPivot() - hips
+	end
 	function output.get_pose(root)
 		local pose = {}
 		local leg_mat = Utils.get_root_space_mat_raw(leg, root)
@@ -28,10 +35,18 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose, root, start)
-		--TODO
+		Utils.do_vanilla_ik(
+			leg,
+			height,
+			start:getColumn(4).xyz,
+			pose[foot_name],
+			pose[bend_target_name],
+			vec(0, -1, 0),
+			root
+		)
 	end
 	function output.reset_pose()
-		upper:setMatrix(leg_rest_mat)
+		leg:setMatrix(leg_rest_mat)
 	end
 	return output
 end

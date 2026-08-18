@@ -5,15 +5,18 @@ local api = {}
 function api.make(
 	arm,
 	is_right,
-	hand_vec,
+	height,
 	elbow_vec
 )
+	height = height or 9
 	local arm_rest_mat = arm:getPositionMatrix()
-	local arm_name
+	local bend_target_name
+	local hand_name
 	local outward_x
 	local hand_rotation_matrix
 	if is_right then
-		arm_name = "right_arm"
+		bend_target_name = "right_arm_bend_target"
+		hand_name = "right_hand"
 		outward_x = 1
 		hand_rotation_matrix = matrices.mat3(
 			vec(0, 1, 0),
@@ -21,7 +24,8 @@ function api.make(
 			vec(0, 0, 1)
 		)
 	else
-		arm_name = "left_arm"
+		bend_target_name = "left_arm_bend_target"
+		hand_name = "left_hand"
 		outward_x = -1
 		hand_rotation_matrix = matrices.mat3(
 			vec(0, -1, 0),
@@ -30,9 +34,12 @@ function api.make(
 		)
 	end
 	local inv_hand_rotation_matrix = hand_rotation_matrix:inverted()
-	hand_vec = hand_vec or vec(0, -9, 0)
-	elbow_vec = elbow_vec or vec(outward_x, -4.5, 1)
+	local hand_vec = vec(0, -height, 0)
+	elbow_vec = elbow_vec or vec(outward_x, -height / 2, 1)
 	local output = {}
+	function output.get_offset(torso_top)
+		return arm:getPivot() - torso_top
+	end
 	function output.get_pose(root)
 		local pose = {}
 		local arm_mat = Utils.get_root_space_mat_raw(arm, root)
@@ -44,10 +51,18 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose, root, start)
-		--TODO
+		Utils.do_vanilla_ik(
+			arm,
+			height,
+			start:getColumn(4).xyz,
+			pose[hand_name],
+			pose[bend_target_name],
+			vec(outward_x, 0, 0),
+			root
+		)
 	end
 	function output.reset_pose()
-		upper:setMatrix(arm_rest_mat)
+		arm:setMatrix(arm_rest_mat)
 	end
 	return output
 end

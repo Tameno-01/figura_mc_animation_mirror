@@ -51,25 +51,21 @@ function api.make(
 		)
 		return pose
 	end
-	function output.apply_pose(pose, root, offsets)
+	function output.apply_pose(pose, root)
 		local parent_mat = Utils.get_root_space_mat_raw(spine[1]:getParent(), root)
 		Utils.set_part_mat(spine[1], parent_mat:inverted() * (pose.hips:copy():translate(-spine[1]:getPivot())))
 		Utils.do_ik(ik_params, pose.torso_top, pose.torso_bend_target, root)
-		local starts = {}
-		starts.head = matrices.mat4()
-		starts.left_arm = matrices.mat4()
-		starts.right_arm = matrices.mat4()
-		starts.left_leg = matrices.mat4()
-		starts.right_leg = matrices.mat4()
-		return starts
 	end
 	function output.reset_pose()
 		for i, v in ipairs(spine) do
 			v:setMatrix(rest_poses[i])
 		end
 	end
-	function output.get_neck_pivot()
+	function output.get_top_pivot()
 		return neck:getPivot()
+	end
+	function output.get_hips_pivot()
+		return spine[1]:getPivot()
 	end
 	return output
 end

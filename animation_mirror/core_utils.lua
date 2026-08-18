@@ -75,6 +75,18 @@ local function make_mat4_valid(mat)
 	)
 end
 
+function api.deep_copy_tbl(tbl)
+	local output = {}
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			output[k] = api.deep_copy_tbl(v)
+		else
+			output[k] = v
+		end
+	end
+	return output
+end
+
 function api.is_zero_approx(vect)
 	if -0.001 > vect.x or vect.x > 0.001 then
 		return false
@@ -121,7 +133,7 @@ end
 
 function api.add_vec_from_avar(name, input, output, scale)
 	local vec_table = input[name]
-	if not type(vec_table) == "table" then
+	if type(vec_table) ~= "table" then
 		output[name] = vec(0, 0, 0)
 		return
 	end
@@ -138,7 +150,7 @@ end
 
 function api.add_mat3_from_avar(name, input, output)
 	local mat_table = input[name]
-	if not type(mat_table) == "table" then
+	if type(mat_table) ~= "table" then
 		output[name] = matrices.mat3()
 		return
 	end
@@ -161,7 +173,7 @@ end
 
 function api.add_mat4_from_avar(name, input, output, scale)
 	local mat_table = input[name]
-	if not type(mat_table) == "table" then
+	if type(mat_table) ~= "table" then
 		output[name] = matrices.mat4()
 		return
 	end

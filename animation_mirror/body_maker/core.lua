@@ -20,10 +20,27 @@ function api.make(
 	if auto_reset == nil then
 		auto_reset = true
 	end
-	local offsets = {} -- TODO: populate this table
+	local torso_top_pivot = torso.get_top_pivot()
+	local hips_pivot = torso.get_hips_pivot()
+	local offsets = {}
+	if head.get_offset ~= nil then
+		offsets.head = head.get_offset(torso_top_pivot)
+	end
+	if left_arm.get_offset ~= nil then
+		offsets.left_arm = left_arm.get_offset(torso_top_pivot)
+	end
+	if right_arm.get_offset ~= nil then
+		offsets.right_arm = right_arm.get_offset(torso_top_pivot)
+	end
+	if left_leg.get_offset ~= nil then
+		offsets.left_leg = left_leg.get_offset(hips_pivot)
+	end
+	if right_leg.get_offset ~= nil then
+		offsets.right_leg = right_leg.get_offset(hips_pivot)
+	end
 	local output = {}
 	output.root = root
-	output.scale = torso.get_neck_pivot().y / VANILLA_NECK_HEIGHT
+	output.scale = torso_top_pivot.y / VANILLA_NECK_HEIGHT
 	function output.get_pose()
 		local head_pose = head.get_pose(root)
 		local torso_pose = torso.get_pose(root)
@@ -47,7 +64,25 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose)
-		local starts = torso.apply_pose(pose, root)
+		local starts = {}
+		local hips_mat3 = pose.hips:deaugmented()
+		local torso_top_mat3 = pose.torso_top:deaugmented()
+		if offsets.head ~= nil then
+			starts.head = pose.torso_top:copy():translate(torso_top_mat3 * offsets.head)
+		end
+		if offsets.left_arm ~= nil then
+			starts.left_arm = pose.torso_top:copy():translate(torso_top_mat3 * offsets.left_arm)
+		end
+		if offsets.right_arm ~= nil then
+			starts.right_arm = pose.torso_top:copy():translate(torso_top_mat3 * offsets.right_arm)
+		end
+		if offsets.left_leg ~= nil then
+			starts.left_leg = pose.hips:copy():translate(hips_mat3 * offsets.left_leg)
+		end
+		if offsets.right_leg ~= nil then
+			starts.right_leg = pose.hips:copy():translate(hips_mat3 * offsets.right_leg)
+		end
+		torso.apply_pose(pose, root)
 		head.apply_pose(pose, root, starts.head)
 		left_arm.apply_pose(pose, root, starts.left_arm)
 		right_arm.apply_pose(pose, root, starts.right_arm)

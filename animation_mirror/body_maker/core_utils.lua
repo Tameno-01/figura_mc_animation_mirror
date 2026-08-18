@@ -184,9 +184,9 @@ function api.do_ik(params, target, bend_target, root)
 	local accumulated_mat = parent_mat * first_part_mat
 	local bend_target_vect = bend_target - start
 	local global_axis = api.perpendicular(bend_target_vect, diff)
-	local deagumented_target = target:deaugmented()
-	local leaf_twist_vect = deagumented_target * params.leaf_twist_vect
-	local leaf_forward_vect = deagumented_target * params.leaf_forward_vect
+	local deaugmented_target = target:deaugmented()
+	local leaf_twist_vect = deaugmented_target * params.leaf_twist_vect
+	local leaf_forward_vect = deaugmented_target * params.leaf_forward_vect
 	local leaf_bend_angle = api.angle_between(leaf_forward_vect, dir)
 	local leaf_bend_axis = api.perpendicular(leaf_forward_vect, dir)
 	local perpendicular_leaf_twist_vect = vectors.rotateAroundAxis(leaf_bend_angle, leaf_twist_vect:copy(), leaf_bend_axis)
@@ -237,6 +237,52 @@ function api.do_ik(params, target, bend_target, root)
 	local post_ik_angle = api.angle_between(post_ik_diff, diff)
 	first_part_mat = api.mat3_rotated_around_axis(post_ik_angle, first_part_mat, inv_parent_mat * post_ik_axis)
 	api.set_part_mat(first_part, api.mat3_augmented_with_pos(first_part_mat, local_start_pos))
+end
+
+function api.do_vanilla_ik(
+	part,
+	part_height,
+	start_pos,
+	target,
+	bend_target,
+	leaf_forward,
+	root
+)
+	local target_point = target:getColumn(4).xyz
+	local diff = target_point - start_pos
+	local distance = diff:length()
+	local part_vect
+	local part_pos
+	if distance > part_height then
+		part_vect = diff:normalized() * part_height
+		part_pos = start_pos
+	else
+		local half_distance = distance / 2
+		local segment_length = part_height / 2
+		local bend_height = math.sqrt(segment_length * segment_length - half_distance * half_distance)
+		local bend_dir = bend_target - start_pos
+		bend_dir = api.perpendicular(diff, api.perpendicular(bend_dir, diff))
+		local bend_vect = bend_dir * bend_height
+		part_vect = (diff / 2 - bend_vect) * 2
+		part_pos = target_point - part_vect
+	end
+	local part_mat_y = -part_vect:normalized()
+	local part_mat_z
+	local part_mat_x
+	local target_mat3 = target:deaugmented()
+	local actual_leaf_forward = target_mat3 * leaf_forward
+	local actual_leaf_side = target_mat3:getColumn(3)
+	local bend_axis = api.perpendicular(part_mat_y, actual_leaf_forward)
+	local bend_angle = api.angle_between(part_mat_y, actual_leaf_forward)
+	vectors.rotateAroundAxis(bend_angle, actual_leaf_side, bend_axis)
+	part_mat_z = actual_leaf_side
+	part_mat_x = api.perpendicular(part_mat_y, part_mat_z)
+	part_mat_z = api.perpendicular(part_mat_x, part_mat_y)
+	local part_mat = matrices.mat3(part_mat_x, part_mat_y, part_mat_z):augmented()
+	part_mat:translate(part_pos)
+	part_mat:translate(-part:getPivot())
+	part_mat = api.get_root_space_mat_raw(part:getParent(), root):inverted() * part_mat
+	api.set_part_mat(part, part_mat)
 end
 
 return api
