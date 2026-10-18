@@ -11,22 +11,24 @@ function api.make(
 	local upper_rest_mat = upper:getPositionMatrix()
 	local lower_rest_mat = lower:getPositionMatrix()
 	local foot_rest_mat = foot:getPositionMatrix()
+	local upper_forward = Utils.perpendicular(vec(1, 0, 0), lower:getPivot() - upper:getPivot())
+	local lower_forward = Utils.perpendicular(vec(1, 0, 0), foot:getPivot() - lower:getPivot())
 	local ik_params = Utils.precompute_ik_params(
 		{
 			{
 				part = upper,
 				leaf_twist = 0.25,
-				leaf_twist_vect = vec(0, 0, -1),
+				leaf_twist_vect = upper_forward,
 				bend_twist = 0.5,
-				bend_twist_vect = vec(0, 0, -1),
+				bend_twist_vect = upper_forward,
 			},
 			{
 				part = lower,
 				angle_multiplier = 1,
 				leaf_twist = 0.66,
-				leaf_twist_vect = vec(0, 0, -1),
+				leaf_twist_vect = lower_forward,
 				bend_twist = 0.3,
-				bend_twist_vect = vec(0, 0, -1),
+				bend_twist_vect = lower_forward,
 			},
 		},
 		{

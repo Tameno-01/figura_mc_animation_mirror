@@ -11,7 +11,7 @@ function api.make(
 	local upper_rest_mat = upper:getPositionMatrix()
 	local lower_rest_mat = lower:getPositionMatrix()
 	local hand_rest_mat = hand:getPositionMatrix()
-	local hand_pose_mat_x = lower:getPivot() - upper:getPivot()
+	local hand_pose_mat_x = hand:getPivot() - lower:getPivot()
 	local hand_name
 	local bend_target_name
 	local ik_start_dir
@@ -34,13 +34,12 @@ function api.make(
 		hand_pose_mat_z:normalized()
 	)
 	local inv_hand_pose_mat = hand_pose_mat:inverted()
-	local up = hand_pose_mat:getColumn(2)
 	local ik_params = Utils.precompute_ik_params(
 		{
 			{
 				part = upper,
 				leaf_twist = 0.25,
-				leaf_twist_vect = up,
+				leaf_twist_vect = vec(0, 0, 1),
 				bend_twist = 0.5,
 				bend_twist_vect = vec(0, 0, 1),
 			},
@@ -48,14 +47,14 @@ function api.make(
 				part = lower,
 				angle_multiplier = 1,
 				leaf_twist = 0.66,
-				leaf_twist_vect = up,
+				leaf_twist_vect = vec(0, 0, 1),
 				bend_twist = 0.3,
 				bend_twist_vect = vec(0, 0, 1),
 			},
 		},
 		{
 			leaf = hand:getPivot(),
-			leaf_twist_vect = vec(0, 1, 0),
+			leaf_twist_vect = vec(0, 0, 1),
 			leaf_forward_vect = ik_start_dir,
 			start_dir = ik_start_dir,
 		}

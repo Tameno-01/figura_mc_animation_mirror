@@ -119,14 +119,19 @@ function api.precompute_ik_params(sections, config)
 	else
 		params.rest_dir = params.pre_adjust_rest_dir
 	end
-	local total_angle_multiplier = 0
-	for i, section in ipairs(sections) do
-		if i ~= 1 then
-			total_angle_multiplier = total_angle_multiplier + section.angle_multiplier
+	local angle_to_multiply
+	if config.angle_multiplier ~= nil then
+		angle_to_multiply = config.angle_multiplier
+	else
+		local total_angle_multiplier = 0
+		for i, section in ipairs(sections) do
+			if i ~= 1 then
+				total_angle_multiplier = total_angle_multiplier + section.angle_multiplier
+			end
 		end
+		local total_angle = 360 - 360 / params.section_count
+		angle_to_multiply = total_angle / total_angle_multiplier
 	end
-	local total_angle = 360 - 360 / params.section_count
-	local angle_to_multiply = total_angle / total_angle_multiplier
 	local accumulated_mat = matrices.mat3()
 	params.sections = {}
 	params.lengths = {}
@@ -156,7 +161,9 @@ function api.precompute_ik_params(sections, config)
 			bend_twist = section.bend_twist,
 			bend_twist_vect = section.bend_twist_vect,
 			angle = angle,
-			pre_ik_mat = pre_ik_mat
+			pre_ik_mat = pre_ik_mat,
+			inv_pre_ik_mat = pre_ik_mat:inverted(),
+			pre_adjust_rest_dir = section_vect:normalized()
 		})
 		accumulated_mat = accumulated_mat * pre_ik_mat
 	end
@@ -178,7 +185,7 @@ function api.do_ik(params, target, bend_target, root)
 	local first_part = params.sections[1].part
 	local parent_mat = api.get_root_space_mat_raw(first_part:getParent(), root):deaugmented()
 	local inv_parent_mat = parent_mat:inverted()
-	local starting_mat = inv_parent_mat * params.sections[1].pre_ik_mat
+	local starting_mat = inv_parent_mat
 	local local_start_pos = vec(0, 0, 0)
 	if params.keep_pos then
 		local_start_pos = first_part:getPositionMatrixRaw():apply(first_part:getPivot()) - first_part:getPivot()
@@ -189,7 +196,6 @@ function api.do_ik(params, target, bend_target, root)
 	local first_axis = api.perpendicular(params.rest_dir, dir)
 	local first_angle = api.angle_between(params.rest_dir, dir)
 	local first_part_mat = api.mat3_rotated_around_axis(first_angle, starting_mat, inv_parent_mat * first_axis)
-	api.set_part_mat(first_part, api.mat3_augmented_with_pos(first_part_mat, local_start_pos))
 	local accumulated_mat = parent_mat * first_part_mat
 	local bend_target_vect = bend_target - start
 	local global_axis = api.perpendicular(bend_target_vect, diff)
@@ -204,19 +210,20 @@ function api.do_ik(params, target, bend_target, root)
 	for i, section in ipairs(params.sections) do
 		local twist_matrix = matrices.mat3()
 		if section.leaf_twist ~= nil then
-			local part_leaf_twist_vect = accumulated_mat * section.leaf_twist_vect
+			local part_leaf_twist_vect = accumulated_mat * section.pre_ik_mat * section.leaf_twist_vect
 			local leaf_twist = api.angle_between(part_leaf_twist_vect, perpendicular_leaf_twist_vect)
 			leaf_twist = leaf_twist * math.sign(dir:dot(api.perpendicular(part_leaf_twist_vect, perpendicular_leaf_twist_vect)))
 			leaf_twist = leaf_twist * section.leaf_twist
-			twist_matrix = api.mat3_rotated_around_axis(leaf_twist, twist_matrix, params.pre_adjust_rest_dir)
+			twist_matrix = api.mat3_rotated_around_axis(leaf_twist, twist_matrix, section.pre_adjust_rest_dir)
 		end
 		if section.bend_twist ~= nil then
-			local part_bend_twist_vect = accumulated_mat * twist_matrix * section.bend_twist_vect
+			local part_bend_twist_vect = accumulated_mat * twist_matrix * section.pre_ik_mat * section.bend_twist_vect
 			local bend_twist = api.angle_between(part_bend_twist_vect, flattened_bend_twist_vect)
 			bend_twist = bend_twist * math.sign(dir:dot(api.perpendicular(part_bend_twist_vect, flattened_bend_twist_vect)))
 			bend_twist = bend_twist * section.bend_twist
-			twist_matrix = api.mat3_rotated_around_axis(bend_twist, twist_matrix, params.pre_adjust_rest_dir)
+			twist_matrix = api.mat3_rotated_around_axis(bend_twist, twist_matrix, section.pre_adjust_rest_dir)
 		end
+		twist_matrix = section.pre_ik_mat * twist_matrix
 		twist_matrices[i] = twist_matrix
 		accumulated_mat = accumulated_mat * twist_matrix
 	end
@@ -233,7 +240,6 @@ function api.do_ik(params, target, bend_target, root)
 		if i ~= 1 then
 			local angle = section.angle * angle_multiplier
 			local part_mat = api.mat3_rotated_around_axis(angle, twist_matrices[i], accumulated_mat:inverted() * global_axis)
-			part_mat = section.pre_ik_mat * part_mat
 			api.set_part_mat(section.part, part_mat:augmented())
 			accumulated_mat = accumulated_mat * part_mat
 		end
