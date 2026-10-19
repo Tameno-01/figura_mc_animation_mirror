@@ -16,15 +16,17 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose, root, start)
+		local parent_mat = Utils.get_root_space_mat_raw(head:getParent(), root)
 		local mat = pose.head:augmented()
 		mat:translate(start:getColumn(4).xyz)
 		mat:translate(-head:getPivot())
-		mat = Utils.get_root_space_mat_raw(head:getParent(), root):inverted() * mat
+		mat = parent_mat:inverted() * mat
 		Utils.set_part_mat(head, mat)
 	end
 	function output.reset_pose()
 		head:setMatrix(head_rest_mat)
 	end
+	output.should_detach = true
 	return output
 end
 

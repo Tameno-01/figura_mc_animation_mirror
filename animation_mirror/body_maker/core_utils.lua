@@ -109,6 +109,13 @@ function api.get_root_space_mat_raw(part, root)
 	return api.get_root_space_mat_raw(part:getParent(), root) * pivot_mat
 end
 
+function api.get_root_space_mat_raw_without_pivot_correction(part, root)
+	if part == root then
+		return matrices.mat4()
+	end
+	return api.get_root_space_mat_raw_without_pivot_correction(part:getParent(), root) * part:getPositionMatrixRaw()
+end
+
 function api.precompute_ik_params(sections, config)
 	local params = {}
 	params.section_count = #sections
@@ -171,23 +178,18 @@ function api.precompute_ik_params(sections, config)
 	for _, len in ipairs(params.lengths) do
 		params.max_dist = params.max_dist + len
 	end
-	if config.keep_pos == true then
-		params.keep_pos = true
-	else
-		params.keep_pos = false
-	end
 	params.leaf_twist_vect = config.leaf_twist_vect
 	params.leaf_forward_vect = config.leaf_forward_vect
 	return params
 end
 
-function api.do_ik(params, target, bend_target, root)
+function api.do_ik(params, target, bend_target, root, keep_pos)
 	local first_part = params.sections[1].part
 	local parent_mat = api.get_root_space_mat_raw(first_part:getParent(), root):deaugmented()
 	local inv_parent_mat = parent_mat:inverted()
 	local starting_mat = inv_parent_mat
 	local local_start_pos = vec(0, 0, 0)
-	if params.keep_pos then
+	if keep_pos then
 		local_start_pos = first_part:getPositionMatrixRaw():apply(first_part:getPivot()) - first_part:getPivot()
 	end
 	local start = api.get_root_space_mat_raw(first_part, root):getColumn(4).xyz
@@ -291,11 +293,12 @@ function api.do_vanilla_ik(
 	part_mat_z = actual_leaf_side
 	part_mat_x = api.perpendicular(part_mat_y, part_mat_z)
 	part_mat_z = api.perpendicular(part_mat_x, part_mat_y)
-	local part_mat = matrices.mat3(part_mat_x, part_mat_y, part_mat_z):augmented()
-	part_mat:translate(part_pos)
+	local part_mat = matrices.mat4()
 	part_mat:translate(-part:getPivot())
-	part_mat = api.get_root_space_mat_raw(part:getParent(), root):inverted() * part_mat
-	api.set_part_mat(part, part_mat)
+	part_mat = matrices.mat3(part_mat_x, part_mat_y, part_mat_z):augmented() * part_mat
+	part_mat:translate(part_pos)
+	part_mat = api.get_root_space_mat_raw_without_pivot_correction(part:getParent(), root):inverted() * part_mat
+	part:setMatrix(part_mat)
 end
 
 return api

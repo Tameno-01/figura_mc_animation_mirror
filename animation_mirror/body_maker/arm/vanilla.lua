@@ -64,6 +64,7 @@ function api.make(
 	function output.reset_pose()
 		arm:setMatrix(arm_rest_mat)
 	end
+	output.should_detach = true
 	return output
 end
 

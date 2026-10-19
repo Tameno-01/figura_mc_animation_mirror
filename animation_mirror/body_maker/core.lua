@@ -23,19 +23,19 @@ function api.make(
 	local torso_top_pivot = torso.get_top_pivot()
 	local hips_pivot = torso.get_hips_pivot()
 	local offsets = {}
-	if head.get_offset ~= nil then
+	if torso.should_detach or head.should_detach then
 		offsets.head = head.get_offset(torso_top_pivot)
 	end
-	if left_arm.get_offset ~= nil then
+	if  torso.should_detach or left_arm.should_detach then
 		offsets.left_arm = left_arm.get_offset(torso_top_pivot)
 	end
-	if right_arm.get_offset ~= nil then
+	if  torso.should_detach or right_arm.should_detach then
 		offsets.right_arm = right_arm.get_offset(torso_top_pivot)
 	end
-	if left_leg.get_offset ~= nil then
+	if  torso.should_detach or left_leg.should_detach then
 		offsets.left_leg = left_leg.get_offset(hips_pivot)
 	end
-	if right_leg.get_offset ~= nil then
+	if  torso.should_detach or right_leg.should_detach then
 		offsets.right_leg = right_leg.get_offset(hips_pivot)
 	end
 	local output = {}

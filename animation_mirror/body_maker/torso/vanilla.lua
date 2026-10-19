@@ -58,15 +58,18 @@ function api.make(
 		local x = Utils.perpendicular(y, z)
 		z = Utils.perpendicular(x, y)
 		local torso_mat3 = matrices.mat3(x, y, z)
-		local torso_mat = torso_mat3:augmented():translate(middle + torso_mat3 * torso_to_middle_vec)
-		local parent = Utils.get_root_space_mat_raw(torso:getParent(), root)
+		local global_torso_mat = torso_mat3:augmented():translate(middle + torso_mat3 * torso_to_middle_vec)
+		local parent = Utils.get_root_space_mat_raw_without_pivot_correction(torso:getParent(), root)
+		local torso_mat = matrices.mat4()
 		torso_mat:translate(-torso:getPivot())
+		torso_mat = global_torso_mat * torso_mat
 		torso_mat = parent:inverted() * torso_mat
-		Utils.set_part_mat(torso, torso_mat)
+		torso:setMatrix(torso_mat)
 	end
 	function output.reset_pose()
 		torso:setMatrix(torso_rest_mat)
 	end
+	output.should_detach = true
 	return output
 end
 

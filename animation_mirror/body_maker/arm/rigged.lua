@@ -6,8 +6,12 @@ function api.make(
 	upper,
 	lower,
 	hand,
-	is_right
+	is_right,
+	is_hand_real
 )
+	if is_hand_real == nil then
+		is_hand_real = true
+	end
 	local upper_rest_mat = upper:getPositionMatrix()
 	local lower_rest_mat = lower:getPositionMatrix()
 	local hand_rest_mat = hand:getPositionMatrix()
@@ -34,6 +38,24 @@ function api.make(
 		hand_pose_mat_z:normalized()
 	)
 	local inv_hand_pose_mat = hand_pose_mat:inverted()
+	local lower_section
+	if is_hand_real then
+		lower_section = {
+			part = lower,
+			angle_multiplier = 1,
+			leaf_twist = 0.66,
+			leaf_twist_vect = vec(0, 0, 1),
+			bend_twist = 0.3,
+			bend_twist_vect = vec(0, 0, 1),
+		}
+	else
+		lower_section = {
+			part = lower,
+			angle_multiplier = 1,
+			leaf_twist = 1,
+			leaf_twist_vect = vec(0, 0, 1),
+		}
+	end
 	local ik_params = Utils.precompute_ik_params(
 		{
 			{
@@ -43,14 +65,7 @@ function api.make(
 				bend_twist = 0.5,
 				bend_twist_vect = vec(0, 0, 1),
 			},
-			{
-				part = lower,
-				angle_multiplier = 1,
-				leaf_twist = 0.66,
-				leaf_twist_vect = vec(0, 0, 1),
-				bend_twist = 0.3,
-				bend_twist_vect = vec(0, 0, 1),
-			},
+			lower_section,
 		},
 		{
 			leaf = hand:getPivot(),
@@ -60,9 +75,12 @@ function api.make(
 		}
 	)
 	local output = {}
+	function output.get_offset(torso_top)
+		return upper:getPivot() - torso_top
+	end
 	function output.get_pose(root)
 		local pose = {}
-		pose.bend_target = Utils.get_root_space_mat_raw(lower, root):getColumn(4).xyz
+		pose.bend_target = Utils.get_root_space_mat_raw(lower, root):apply(vec(0, 0, 0.5))
 		local global_hand_mat = Utils.get_root_space_mat_raw(hand, root)
 		local global_hand_rot = global_hand_mat:deaugmented()
 		global_hand_rot = global_hand_rot * hand_pose_mat
@@ -75,16 +93,29 @@ function api.make(
 		pose.hand = global_hand_mat
 		return pose
 	end
-	function output.apply_pose(pose, root)
-		Utils.do_ik(ik_params, pose[hand_name], pose[bend_target_name], root)
-		local hand_parent_mat = Utils.get_root_space_mat_raw(hand:getParent(), root):deaugmented()
-		Utils.set_part_mat(hand, (hand_parent_mat:inverted() * (pose[hand_name]:deaugmented() * inv_hand_pose_mat)):augmented())
+	function output.apply_pose(pose, root, start)
+		if start ~= nil then
+			local parent_mat = Utils.get_root_space_mat_raw_without_pivot_correction(upper:getParent(), root)
+			local mat = matrices.mat4()
+			mat:translate(-upper:getPivot())
+			mat = start * mat
+			mat = parent_mat:inverted() * mat
+			upper:setMatrix(mat)
+		end
+		Utils.do_ik(ik_params, pose[hand_name], pose[bend_target_name], root, start ~= nil)
+		if is_hand_real then			
+			local hand_parent_mat = Utils.get_root_space_mat_raw(hand:getParent(), root):deaugmented()
+			Utils.set_part_mat(hand, (hand_parent_mat:inverted() * (pose[hand_name]:deaugmented() * inv_hand_pose_mat)):augmented())
+		end
 	end
 	function output.reset_pose()
 		upper:setMatrix(upper_rest_mat)
 		lower:setMatrix(lower_rest_mat)
-		hand:setMatrix(hand_rest_mat)
+		if is_hand_real then
+			hand:setMatrix(hand_rest_mat)
+		end
 	end
+	output.should_detach = false
 	return output
 end
 
