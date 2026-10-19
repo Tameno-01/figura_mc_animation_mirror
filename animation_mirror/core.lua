@@ -13,6 +13,16 @@ local body = nil
 -- this function will be given a body later in this script
 local stop_copying
 
+local function is_allowed_to_copy(uuid)
+	return true
+end
+
+local function exposed_is_allowed_to_copy(uuid)
+	return is_allowed_to_copy(uuid)
+end
+
+avatar:store("AnimationMirror_is_allowed_to_copy", exposed_is_allowed_to_copy)
+
 local function set_pose_getter(value)
 	if type(value) ~= "function" then
 		return
@@ -29,6 +39,9 @@ end
 
 local function send_pose_getter(to)
 	if current_pose == nil then
+		return
+	end
+	if not exposed_is_allowed_to_copy(to) then
 		return
 	end
 	local vars = world.avatarVars()[to]
@@ -164,6 +177,10 @@ function api.set_body(p_body)
 	body = p_body
 end
 
+function api.set_allow_copy_func(func)
+	is_allowed_to_copy = func
+end
+
 function api.begin_being_source()
 	if body == nil then
 		error("AnimationMirror: No body was provided")
@@ -182,10 +199,24 @@ function api.can_copy(uuid)
 	if player_vars == nil then
 		return false
 	end
+	if type(player_vars.AnimationMirror_is_allowed_to_copy) ~= "function" then
+		return false
+	end
+	local player_is_allowed_to_copy = player_vars.AnimationMirror_is_allowed_to_copy
 	if type(player_vars.AnimationMirror_source) == "string" then
-		return true
+		local success, output = pcall(player_is_allowed_to_copy, player_vars.AnimationMirror_source)
+		if success and output then
+			return true
+		else
+			return false
+		end
 	elseif type(player_vars.AnimationMirror_send_pose_getter) == "function" then
-		return true
+		local success, output = pcall(player_is_allowed_to_copy, uuid)
+		if success and output then
+			return true
+		else
+			return false
+		end
 	end
 	return false
 end
