@@ -16,12 +16,13 @@ function api.make(
 		return pose
 	end
 	function output.apply_pose(pose, root, start)
-		local parent_mat = Utils.get_root_space_mat_raw(head:getParent(), root)
-		local mat = pose.head:augmented()
-		mat:translate(start:getColumn(4).xyz)
-		mat:translate(-head:getPivot())
-		mat = parent_mat:inverted() * mat
-		Utils.set_part_mat(head, mat)
+		local global_head_mat = pose.head:augmented():translate(start:getColumn(4).xyz)
+		local parent = Utils.get_root_space_mat_raw_without_pivot_correction(head:getParent(), root)
+		local head_mat = matrices.mat4()
+		head_mat:translate(-head:getPivot())
+		head_mat = global_head_mat * head_mat
+		head_mat = parent:inverted() * head_mat
+		head:setMatrix(head_mat)
 	end
 	function output.reset_pose()
 		head:setMatrix(head_rest_mat)

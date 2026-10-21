@@ -73,9 +73,12 @@ function api.make(
 	end
 	function output.apply_pose(pose, root, start)
 		if start ~= nil then
-			local parent_mat = Utils.get_root_space_mat_raw(upper:getParent(), root)
-			local mat = parent_mat:inverted() * start:copy():translate(-upper:getPivot())
-			Utils.set_part_mat(upper, mat)
+			local parent_mat = Utils.get_root_space_mat_raw_without_pivot_correction(upper:getParent(), root)
+			local mat = matrices.mat4()
+			mat:translate(-upper:getPivot())
+			mat = start * mat
+			mat = parent_mat:inverted() * mat
+			upper:setMatrix(mat)
 		end
 		Utils.do_ik(ik_params, pose[foot_name], pose[bend_target_name], root, start ~= nil)
 		if is_foot_real then
