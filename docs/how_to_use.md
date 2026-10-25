@@ -1,6 +1,8 @@
-# WARNING! These docs are incomplete!!
+# How to use
 
-I'm uploading this to github mostly to test if things are working
+I know it's long, but please read try to read this whole guide, it should cover everything.
+
+**Installation** is covered in step 1.
 
 # Step 0: Rig Requirements
 
@@ -30,24 +32,24 @@ Depending on which style of rig each part has, what's considered a valid rest po
 
 **Head:**
 
-- Vanilla styled (Head can detach for more expressiveness)
-- Rigged (Head stays in place, can optionally have a neck)
+- [Vanilla styled](head/vanilla_rig_requirements.md) (Head can detach for more expressiveness)
+- [Rigged](head/rigged_rig_requirements.md) (Head stays in place, can optionally have a neck)
 
 **Torso:**
 
-- Vanilla (Single joint)
-- Rigged (2 or more joints)
+- [Vanilla](torso/vanilla_rig_requirements.md) (Single joint)
+- [Rigged](torso/rigged_rig_requirements.md) (2 or more joints)
 
 **Arms:**
 
-- Vanilla (Single joint)
-- Rigged (With and elbow joint and an optional hand)
+- [Vanilla](arm/vanilla_rig_requirements.md) (Single joint)
+- [Rigged](arm/rigged_rig_requirements.md) (With and elbow joint and an optional hand)
 
 **Legs:**
 
-- Vanilla (Single joint)
-- Rigged (With and knee joint and an optional foot)
-- Digitigrade (Animal legs)
+- [Vanilla](leg/vanilla_rig_requirements.md) (Single joint)
+- [Rigged](leg/rigged_rig_requirements.md) (With and knee joint and an optional foot)
+- [Digitigrade](leg/digitigarde_rig_requirements.md) (Animal legs)
 
 ## Step 0.3: Set rotations back to what they were
 

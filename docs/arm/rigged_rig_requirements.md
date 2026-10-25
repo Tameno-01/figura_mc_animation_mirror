@@ -10,4 +10,4 @@ The elbow can be bent, but if it is, it must only bend around the z axis.
 
 The hand is optional, but if it's not present, there must be an empty group placed where the hand would be. This is to tell Animation Mirror where the lower arm ends.
 
-If the hand is present, the thumb must be facing forward.
+If the hand is present, the wrist must not be bent and the thumb must be facing forward (towards negative Z in blockbench).
