@@ -1,13 +1,16 @@
 local Utils = require("./core_utils")
+local EventHandler = require("./core_event_handler")
 
 local api = {}
+
+api.events = EventHandler
+api.events.new("state_change")
+api.events.new("source_change")
 
 local current_state = "OFF"
 local source_player_uuid = nil
 local current_pose = nil
 local pose_getter = nil
-local state_change_functions = {}
-local source_change_functions = {}
 local body = nil
 
 -- this function will be given a body later in this script
@@ -63,9 +66,7 @@ local function change_state(to)
 			body.reset_pose()
 		end
 	end
-	for func, _ in pairs(state_change_functions) do
-		func(from, to)
-	end
+	api.events.state_change:emit(to, from)
 end
 
 local function source_render()
@@ -158,9 +159,7 @@ local function begin_copying(uuid)
 	end
 	avatar:store("AnimationMirror_source", uuid)
 	if prev_source_player_uuid ~= nil then
-		for func, _ in pairs(source_change_functions) do
-			func(prev_source_player_uuid, source_player_uuid)
-		end
+		api.events.source_change:emit()
 	end
 	return true
 end
@@ -260,33 +259,5 @@ end
 function api.get_source_player_uuid()
 	return source_player_uuid
 end
-
-function api.register_state_change_func(func)
-	state_change_functions[func] = true
-end
-
-function api.remove_state_change_func(func)
-	state_change_functions[func] = nil
-end
-
-function api.register_source_change_func(func)
-	source_change_functions[func] = true
-end
-
-function api.remove_source_change_func(func)
-	source_change_functions[func] = nil
-end
-
-local meta = {}
-
-function meta.__newindex(_, k, v)
-	if k == "state_change" then
-		api.register_state_change_func(v)
-	elseif k == "source_change" then
-		api.register_source_change_func(v)
-	end
-end
-
-setmetatable(api, meta)
 
 return api
