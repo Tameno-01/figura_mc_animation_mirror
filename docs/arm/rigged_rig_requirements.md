@@ -1,6 +1,6 @@
 # Rigged arm requirements
 
-The arm must have an elbow joint for this page to apply, if it doesn't, see the [vanilla arm rig requirements](../arm/vanilla_rig_requirements.md).
+The arm must have an elbow joint for this page to apply, if it doesn't, see the [vanilla arm rig requirements](vanilla_rig_requirements.md).
 
 Unless you're using a [vanilla-styled torso](../torso/vanilla_rig_requirements.md), the arm must be directly or indirectly parented to the torso.
 

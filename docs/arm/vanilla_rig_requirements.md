@@ -1,6 +1,6 @@
 # Vanilla arm requirements
 
-The arm must NOT have an elbow joint for this page to apply, if it does, see the [rigged arm requirements](../arm/rigged_rig_requirements.md).
+The arm must NOT have an elbow joint for this page to apply, if it does, see the [rigged arm requirements](rigged_rig_requirements.md).
 
 The arm must be pointed down (in an I pose).
 

@@ -1,6 +1,6 @@
 # Rigged leg requirements.
 
-The leg must have an knee joint for this page to apply, if it doesn't, see the [vanilla leg rig requirements](../leg/vanilla_rig_requirements.md).
+The leg must have an knee joint for this page to apply, if it doesn't, see the [vanilla leg rig requirements](vanilla_rig_requirements.md).
 
 Unless you're using a [vanilla-styled torso](../torso/vanilla_rig_requirements.md), the leg must be directly or indirectly parented to the torso.
 

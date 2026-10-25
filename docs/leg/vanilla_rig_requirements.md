@@ -1,6 +1,6 @@
 # Vanilla arm requirements
 
-The leg must NOT have an knee joint for this page to apply, if it does, see the [rigged leg requirements](../leg/rigged_rig_requirements.md).
+The leg must NOT have an knee joint for this page to apply, if it does, see the [rigged leg requirements](rigged_rig_requirements.md).
 
 The leg must be pointed down (in an I pose).
 

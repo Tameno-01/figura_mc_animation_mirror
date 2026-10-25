@@ -1,6 +1,6 @@
 # Rigged torso requirements.
 
-The torso must have 2 or more joints, if it doesn't, see the [vanilla torso rig requirements](../torso/vanilla_rig_requirements.md).
+The torso must have 2 or more joints, if it doesn't, see the [vanilla torso rig requirements](vanilla_rig_requirements.md).
 
 The torso must be rigged bottom to top, in other words, the bottom-most joint should be the parent of the rest of the torso.
 
