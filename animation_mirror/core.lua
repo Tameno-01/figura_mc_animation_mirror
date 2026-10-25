@@ -197,28 +197,21 @@ function api.begin_being_source()
 end
 
 function api.can_copy(uuid)
-	local player_vars = world.avatarVars()[uuid]
+	local source = api.get_others_source_uuid(uuid)
+	if source == nil then
+		return false
+	end
+	local player_vars = world.avatarVars()[source]
 	if player_vars == nil then
 		return false
 	end
-	if type(player_vars.AnimationMirror_is_allowed_to_copy) ~= "function" then
+	local player_is_allowed_to_copy = player_vars.AnimationMirror_is_allowed_to_copy
+	if type(player_is_allowed_to_copy) ~= "function" then
 		return false
 	end
-	local player_is_allowed_to_copy = player_vars.AnimationMirror_is_allowed_to_copy
-	if type(player_vars.AnimationMirror_source) == "string" then
-		local success, output = pcall(player_is_allowed_to_copy, player_vars.AnimationMirror_source)
-		if success and output then
-			return true
-		else
-			return false
-		end
-	elseif type(player_vars.AnimationMirror_send_pose_getter) == "function" then
-		local success, output = pcall(player_is_allowed_to_copy, uuid)
-		if success and output then
-			return true
-		else
-			return false
-		end
+	local success, output = pcall(player_is_allowed_to_copy, avatar:getUUID())
+	if success and output then
+		return true
 	end
 	return false
 end
@@ -257,7 +250,24 @@ function api.get_current_state()
 end
 
 function api.get_source_player_uuid()
+	if current_state == "SOURCE" then
+		return avatar:getUUID()
+	end
 	return source_player_uuid
+end
+
+function api.get_others_source_uuid(uuid)
+	local player_vars = world.avatarVars()[uuid]
+	if player_vars == nil then
+		return nil
+	end
+	if type(player_vars.AnimationMirror_source) == "string" then
+		return player_vars.AnimationMirror_source
+	end
+	if type(player_vars.AnimationMirror_send_pose_getter) == "function" then
+		return uuid
+	end
+	return nil
 end
 
 return api
