@@ -1,4 +1,4 @@
-# Vanilla head rig requirements.
+# Vanilla head rig requirements
 
 The head must be facing forward (towards negative Z in blockbench).
 

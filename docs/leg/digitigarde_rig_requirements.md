@@ -1,4 +1,4 @@
-# Digitigrade leg rig requirements.
+# Digitigrade leg rig requirements
 
 In this guide, the sections of the digitigrade leg will be called upper leg, lower leg, lower leg 2 and foot. The anatomically correct way to refer to them is Thigh, Calf, Foot and Toes, but the former naming convention is less confusing.
 

@@ -1,4 +1,4 @@
-# Rigged torso requirements.
+# Rigged torso requirements
 
 The torso must have 2 or more joints, if it doesn't, see the [vanilla torso rig requirements](vanilla_rig_requirements.md).
 

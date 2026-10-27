@@ -1,4 +1,4 @@
-# Vanilla arm requirements
+# Vanilla leg requirements
 
 The leg must NOT have an knee joint for this page to apply, if it does, see the [rigged leg requirements](rigged_rig_requirements.md).
 

@@ -1,4 +1,4 @@
-# Rigged leg requirements.
+# Rigged leg requirements
 
 The leg must have an knee joint for this page to apply, if it doesn't, see the [vanilla leg rig requirements](vanilla_rig_requirements.md).
 

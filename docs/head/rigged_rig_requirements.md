@@ -1,4 +1,4 @@
-# Rigged head requirements.
+# Rigged head requirements
 
 The head must be facing forward (towards negative Z in blockbench).
 

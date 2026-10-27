@@ -1,4 +1,4 @@
-# Vanilla torso rig requirements.
+# Vanilla torso rig requirements
 
 The torso must be single-joint for this page to apply, in other words, it should not be able to bend, if it can, see [rigged torso requirements](rigged_rig_requirements.md)
 
