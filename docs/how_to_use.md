@@ -94,7 +94,7 @@ Depending on what type of rig each of those parts has, the setup is slightly dif
 
 - [Vanilla](leg/vanilla_setup.md)
 - [Rigged](leg/rigged_setup.md)
-- [Digitigrade](leg/digitigarde_setup.md)
+- [Digitigrade](leg/digitigrade_setup.md)
 
 ## Step 2.2: Make and assign the full body
 
