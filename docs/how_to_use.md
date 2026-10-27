@@ -104,6 +104,12 @@ First, require the body maker.
 local BodyMaker = require("animation_mirror/body_maker/core")
 ```
 
+And obviously, animation mirror as well:
+
+```lua
+local AnimationMirror = require("animation_mirror/core")
+```
+
 You can then use it to make the body using all the body parts you made and assign it to animation mirror.
 
 ```lua
@@ -128,3 +134,114 @@ Note the last 2 `nil` parameters, they're optional, but very important.
 `auto reset` determines whether the position, rotation and scale of parts gets reset after you finish mirroring someone. If true, parts will be reset to whatever state they were in when all the `make` functions were called. It's recommended to leave this as `true`.
 
 # Step 3: Hook Animation Mirror into your emotes system
+
+Being mirrorable is essentially a global switch you turn on at will, this switch is NOT automatically pinged. I know this is manual, but i can't think of a better way for the API to work.
+
+Let's say you have some pings for doing an emote:
+
+```lua
+function pings.do_emote()
+	animations.model.my_cool_emote:play()
+end
+
+function pings.stop_emote()
+	animations.model.my_cool_emote:stop()
+end
+```
+
+You can make people able to mirror that emote with this modification:
+
+```lua
+function pings.do_emote()
+	animations.model.my_cool_emote:play()
+	AnimationMirror.begin_being_source()
+end
+
+function pings.stop_emote()
+	animations.model.my_cool_emote:stop()
+	AnimationMirror:stop()
+end
+```
+
+You emote system is probably more complicated than this, but this example should suffice for explaining how being mirrorable works.
+
+# Step 4: Implement mirroring other people
+
+Mirroring other people is significantly more complex than being mirrorable.
+
+## Step 4.1: Disable parent types and animations when mirroring
+
+Parent types and blockbench animations mess with how animation mirror handles animating your avatar, so they need to be disabled when animation mirror is the `COPYING` state (mirroring is referred to as "copying" internally).
+
+To aid with this, you can use the `state_change` event like so:
+
+```lua
+function AnimationMirror.events.state_change(new, old)
+	if new == "COPYING" then
+		-- Parent type and animation disabling logic goes here.
+	end
+	if old == "COPYING" then
+		-- Parent type and animation re-enabling logic goes here.
+	end
+end
+```
+
+You can use `ModelPart:setParentType()` to disable parent types.
+
+## Step 4.2: Mirror other people
+
+You mirror other people with this function:
+
+```lua
+AnimationMirror.begin_copying(uuid)
+```
+
+You can get the UUID of whoever you're looking at by first requiring player picker:
+
+```lua
+local AnimationMirrorPlayerPicker = require("animation_mirror/player_picker")
+```
+
+And calling the following function:
+
+```lua
+local uuid = AnimationMirrorPlayerPicker.pick_player()
+```
+
+Here's how you can, for example, bind mirroring whoever your looking at to the X key:
+
+```lua
+function pings.begin_copying(uuid)
+	AnimationMirror.begin_copying(uuid)
+end
+
+function pings.stop_animation_mirror()
+	AnimationMirror:stop()
+end
+
+keybinds:newKeybind(
+	"pick_player",
+	"key.keyboard.x"
+):onPress(function()
+	if AnimationMirror.get_current_state() == "COPYING" then
+		pings.stop_animation_mirror()
+	else
+	local uuid = AnimationMirrorPlayerPicker.pick_player()
+		if uuid ~= nil then
+			pings.begin_copying(uuid)
+		end
+	end
+end)
+```
+
+This code snippet will also make you stop mirroring if you press the X key while already mirroring someone.
+
+It is worth noting that calling `AnimationMirror.begin_being_source()` will stop you mirroring.
+
+You probably want a more complicated system than this, but implementing it highly depends on how your avatar is set up. This example should be enough to explain how mirroring works.
+
+# Step 5: "Mirror me" indicator
+
+You may notice that animation mirror shows a little piece of text saying "Mirror me" next to anyone who's mirrorable.
+
+You can disable this by deleting the file `animation_mirror\player_tracker\mirror_me_text.lua`. If you don't plan to implement any system to indicate who's mirrorable, delete the `animation_mirror\player_tracker` folder.
