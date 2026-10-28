@@ -211,6 +211,20 @@ local uuid = AnimationMirrorPlayerPicker.pick_player()
 Here's how you can, for example, bind mirroring whoever your looking at to the X key:
 
 ```lua
+keybinds:newKeybind(
+	"pick_player",
+	"key.keyboard.x"
+):onPress(function()
+	if AnimationMirror.get_current_state() == "COPYING" then
+		pings.stop_animation_mirror()
+	else
+	local uuid = AnimationMirrorPlayerPicker.pick_player()
+		if uuid ~= nil then
+			pings.begin_copying(uuid)
+		end
+	end
+end)
+
 function pings.begin_copying(uuid)
 	AnimationMirror.begin_copying(uuid)
 end
@@ -218,6 +232,78 @@ end
 function pings.stop_animation_mirror()
 	AnimationMirror:stop()
 end
+```
+
+This code snippet will also make you stop mirroring if you press the X key while already mirroring someone.
+
+It is worth noting that calling `AnimationMirror.begin_being_source()` will stop you mirroring.
+
+You probably want a more complicated system than this, but implementing it highly depends on how your avatar is set up. This example should be enough to explain how mirroring works.
+
+# Example script
+
+Here's an example script with everything we've done so far, this is how one could go about implementing a vanilla-style avatar, the changes needed for other rigs should be minor, but note that this is just an example script with functionality missing.
+
+```lua
+local AnimationMirror = require("animation_mirror/core")
+local HeadMaker = require("animation_mirror/body_maker/head/vanilla")
+local TorsoMaker = require("animation_mirror/body_maker/torso/vanilla")
+local ArmMaker = require("animation_mirror/body_maker/arm/vanilla")
+local LegMaker = require("animation_mirror/body_maker/leg/vanilla")
+local BodyMaker = require("animation_mirror/body_maker/core")
+local AnimationMirrorPlayerPicker = require("animation_mirror/player_picker")
+
+local model = models.model
+local root = model.root
+local head = root.Head
+local torso = root.Body
+local left_arm = torso.LeftArm
+local right_arm = torso.RightArm
+local left_leg = root.LeftLeg
+local right_leg = root.RightLeg
+
+-- A lot of function parameters here are missing
+-- because they're left as their default values.
+
+local animation_mirror_head = HeadMaker.make(
+	head
+)
+
+local animation_mirror_torso = TorsoMaker.make(
+	torso,
+	false
+)
+
+local animation_mirror_left_arm = ArmMaker.make(
+	left_arm,
+	false
+)
+
+local animation_mirror_right_arm = ArmMaker.make(
+	right_arm,
+	true
+)
+
+local animation_mirror_left_leg = LegMaker.make(
+	left_leg,
+	false
+)
+
+local animation_mirror_right_leg = LegMaker.make(
+	right_leg,
+	true
+)
+
+local body = BodyMaker.make(
+	animation_mirror_head,
+	animation_mirror_torso,
+	animation_mirror_left_arm,
+	animation_mirror_right_arm,
+	animation_mirror_left_leg,
+	animation_mirror_right_leg
+)
+
+AnimationMirror.set_body(body)
 
 keybinds:newKeybind(
 	"pick_player",
@@ -232,13 +318,52 @@ keybinds:newKeybind(
 		end
 	end
 end)
+
+function AnimationMirror.events.state_change(new, old)
+	if new == "COPYING" then
+		animations.model.my_cool_emote:stop()
+		head:setParentType("NONE")
+		torso:setParentType("NONE")
+		left_arm:setParentType("NONE")
+		right_arm:setParentType("NONE")
+		left_leg:setParentType("NONE")
+		right_leg:setParentType("NONE")
+	end
+	if old == "COPYING" then
+		head:setParentType("HEAD")
+		torso:setParentType("BODY")
+		left_arm:setParentType("LEFT_ARM")
+		right_arm:setParentType("RIGHT_ARM")
+		left_leg:setParentType("LEFT_LEG")
+		right_leg:setParentType("RIGHT_LEG")
+	end
+end
+
+-- Triggering the emote pings is not in this example,
+-- how to do so is left up to you.
+
+function pings.do_emote()
+	animations.model.my_cool_emote:play()
+	AnimationMirror.begin_being_source()
+end
+
+function pings.stop_emote()
+	animations.model.my_cool_emote:stop()
+	AnimationMirror:stop()
+end
+
+function pings.start_source()
+	AnimationMirror.begin_being_source()
+end
+
+function pings.begin_copying(uuid)
+	AnimationMirror.begin_copying(uuid)
+end
+
+function pings.stop_animation_mirror()
+	AnimationMirror:stop()
+end
 ```
-
-This code snippet will also make you stop mirroring if you press the X key while already mirroring someone.
-
-It is worth noting that calling `AnimationMirror.begin_being_source()` will stop you mirroring.
-
-You probably want a more complicated system than this, but implementing it highly depends on how your avatar is set up. This example should be enough to explain how mirroring works.
 
 # Step 5: "Mirror me" indicator
 
