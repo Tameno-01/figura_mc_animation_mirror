@@ -133,7 +133,11 @@ Note the last 2 `nil` parameters, they're optional, but very important.
 
 `auto reset` determines whether the position, rotation and scale of parts gets reset after you finish mirroring someone. If true, parts will be reset to whatever state they were in when all the `make` functions were called. It's recommended to leave this as `true`.
 
-# Step 3: Hook Animation Mirror into your emotes system
+# Step 3: Delete the files you're not using
+
+If you look at the `animation_mirror/body_maker` folder, you will see sub-folders for all the body parts animation mirror considers, if you look into those folders, you'll notice that for each one you're only requiring one of the files in it. You can delete all the other files to save avatar space.
+
+# Step 4: Hook Animation Mirror into your emotes system
 
 Being mirrorable is essentially a global switch you turn on at will, this switch is NOT automatically pinged. I know this is manual, but i can't think of a better way for the API to work.
 
@@ -165,11 +169,11 @@ end
 
 You emote system is probably more complicated than this, but this example should suffice for explaining how being mirrorable works.
 
-# Step 4: Implement mirroring other people
+# Step 5: Implement mirroring other people
 
 Mirroring other people is significantly more complex than being mirrorable.
 
-## Step 4.1: Disable parent types and animations when mirroring
+## Step 5.1: Disable parent types and animations when mirroring
 
 Parent types and blockbench animations mess with how animation mirror handles animating your avatar, so they need to be disabled when animation mirror is the `COPYING` state (mirroring is referred to as "copying" internally).
 
@@ -188,7 +192,7 @@ end
 
 You can use `ModelPart:setParentType()` to disable parent types.
 
-## Step 4.2: Mirror other people
+## Step 5.2: Mirror other people
 
 You mirror other people with this function:
 
@@ -196,17 +200,19 @@ You mirror other people with this function:
 AnimationMirror.begin_copying(uuid)
 ```
 
-You can get the UUID of whoever you're looking at by first requiring player picker:
+You can get the UUID of whoever you're looking at by first requiring PlayerPicker:
 
 ```lua
-local AnimationMirrorPlayerPicker = require("animation_mirror/player_picker")
+local PlayerPicker = require("animation_mirror/player_picker")
 ```
 
 And calling the following function:
 
 ```lua
-local uuid = AnimationMirrorPlayerPicker.pick_player()
+local uuid = PlayerPicker.pick_player()
 ```
+
+You can find more info on PlayerPicker [here](player_picker.md). If you don't need this utility and have your own system for getting people's uuid, you can delete the `animation_mirror/player_picker.lua` file.
 
 Here's how you can, for example, bind mirroring whoever your looking at to the X key:
 
@@ -218,7 +224,7 @@ keybinds:newKeybind(
 	if AnimationMirror.get_current_state() == "COPYING" then
 		pings.stop_animation_mirror()
 	else
-	local uuid = AnimationMirrorPlayerPicker.pick_player()
+	local uuid = PlayerPicker.pick_player()
 		if uuid ~= nil then
 			pings.begin_copying(uuid)
 		end
@@ -240,7 +246,7 @@ It is worth noting that calling `AnimationMirror.begin_being_source()` will stop
 
 You probably want a more complicated system than this, but implementing it highly depends on how your avatar is set up. This example should be enough to explain how mirroring works.
 
-# Step 5: Choosing who you want to mirror you
+# Step 6: Choosing who you want to mirror you
 
 Here's how you can, for example, have a uuid-based blacklist:
 
@@ -272,7 +278,7 @@ local TorsoMaker = require("animation_mirror/body_maker/torso/vanilla")
 local ArmMaker = require("animation_mirror/body_maker/arm/vanilla")
 local LegMaker = require("animation_mirror/body_maker/leg/vanilla")
 local BodyMaker = require("animation_mirror/body_maker/core")
-local AnimationMirrorPlayerPicker = require("animation_mirror/player_picker")
+local PlayerPicker = require("animation_mirror/player_picker")
 
 -- You technically don't need to do this,
 -- but it makes getting parts easier and cleaner.
@@ -344,7 +350,7 @@ keybinds:newKeybind(
 	if AnimationMirror.get_current_state() == "COPYING" then
 		pings.stop_animation_mirror()
 	else
-	local uuid = AnimationMirrorPlayerPicker.pick_player()
+	local uuid = PlayerPicker.pick_player()
 		if uuid ~= nil then
 			pings.begin_copying(uuid)
 		end
@@ -397,7 +403,7 @@ function pings.stop_animation_mirror()
 end
 ```
 
-# Step 6: "Mirror me" indicator
+# Step 7: "Mirror me" indicator
 
 You may notice that animation mirror shows a little piece of text saying "Mirror me" next to anyone who's mirrorable.
 

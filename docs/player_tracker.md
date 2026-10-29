@@ -32,5 +32,7 @@ While a player is active, PlayerTracker will call `rended_func` every frame and 
 
 When a player stops being active, and `delete_func` is present, PlayerTracker tracker will call `delete_func` with whatever `create_func` returned for that player as the first parameter.
 
+**IMPORTANT:** Calling `PlayerTracker.new()` only works on the host, otherwise, it does nothing.
+
 For a practical example, see the `animation_mirror/player_tracker/mirror_me_text.lua` file. This is the built-in implementation that shows the "Mirror me" text next to anyone who's mirrorable.
 
