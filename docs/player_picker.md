@@ -1,6 +1,6 @@
 # Player picker
 
-PlayerPicker is a simple utility to get the UUID of whoever you're looking at. if you already have a system for getting peoples's UUIDs, you don't need this utility and can delete the `animation_mirror/player_picker.lua` file.
+PlayerPicker is a simple utility to get the UUID of whoever you're looking at. if you already have a system for getting people's UUIDs, you don't need this utility and can delete the `animation_mirror/player_picker.lua` file.
 
 To use it, first require PlayerPicker:
 

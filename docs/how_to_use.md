@@ -212,7 +212,7 @@ And calling the following function:
 local uuid = PlayerPicker.pick_player()
 ```
 
-You can find more info on PlayerPicker [here](player_picker.md). If you don't need this utility and have your own system for getting people's uuid, you can delete the `animation_mirror/player_picker.lua` file.
+You can find more info on PlayerPicker [here](player_picker.md). If you don't need this utility and have your own system for getting people's uuids, you can delete the `animation_mirror/player_picker.lua` file.
 
 Here's how you can, for example, bind mirroring whoever your looking at to the X key:
 
@@ -258,7 +258,7 @@ local blacklist = {
 
 AnimationMirror.set_allow_copy_func(function(uuid)
 	return not blacklist[uuid]
-)
+end)
 ```
 
 As you can see, `AnimationMirror.set_allow_copy_func()` takes in a function, which takes in a uuid and returns either `true` or `false`. When someone tries to mirror you, Animation Mirror will run this function with their uuid. If it returns `true`, that person will be able to mirror you, if it returns `false`, they won't.
