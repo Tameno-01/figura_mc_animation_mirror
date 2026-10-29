@@ -1,4 +1,4 @@
-# Animation mirror (core) events.
+# Animation Mirror (core) events.
 
 For this page, assume we required Animation Mirror like so:
 

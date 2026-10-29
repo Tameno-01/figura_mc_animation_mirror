@@ -26,7 +26,7 @@ Animation Mirror does not care what rotations joints have in blockbench, however
 
 ## Step 0.2: Valid rest poses
 
-Animation mirror treats each body part as a separate, individually configurable thing, more precisely, it considers the following parts: Head, torso, left arm, right arm, left leg and right leg.
+Animation Mirror treats each body part as a separate, individually configurable thing, more precisely, it considers the following parts: Head, torso, left arm, right arm, left leg and right leg.
 
 Depending on which style of rig each part has, what's considered a valid rest pose is different. The following are precise definitions of the valid rest poses each type of rig can have, categorized by body part. You only need to read the ones that apply to your rig.
 
@@ -67,7 +67,7 @@ Extract the zip and locate the folder called `animation_mirror`. it may be insid
 
 In Animation Mirror, "making" a body refers to gathering all the information performing the setup necessary to read and set its pose.
 
-It is recommended you put all the following code snippets in either your main lua file or a lua file created specifically for animation mirror.
+It is recommended you put all the following code snippets in either your main lua file or a lua file created specifically for Animation Mirror.
 
 ## Step 2.1: Make the body parts
 
@@ -104,13 +104,13 @@ First, require the body maker.
 local BodyMaker = require("animation_mirror/body_maker/core")
 ```
 
-And obviously, animation mirror as well:
+And obviously, Animation Mirror as well:
 
 ```lua
 local AnimationMirror = require("animation_mirror/core")
 ```
 
-You can then use it to make the body using all the body parts you made and assign it to animation mirror.
+You can then use it to make the body using all the body parts you made and assign it to Animation Mirror.
 
 ```lua
 local animation_mirror_body = BodyMaker.make(
@@ -135,7 +135,7 @@ Note the last 2 `nil` parameters, they're optional, but very important.
 
 # Step 3: Delete the files you're not using
 
-If you look at the `animation_mirror/body_maker` folder, you will see sub-folders for all the body parts animation mirror considers, if you look into those folders, you'll notice that for each one you're only requiring one of the files in it. You can delete all the other files to save avatar space.
+If you look at the `animation_mirror/body_maker` folder, you will see sub-folders for all the body parts Animation Mirror considers, if you look into those folders, you'll notice that for each one you're only requiring one of the files in it. You can delete all the other files to save avatar space.
 
 # Step 4: Hook Animation Mirror into your emotes system
 
@@ -175,7 +175,7 @@ Mirroring other people is significantly more complex than being mirrorable.
 
 ## Step 5.1: Disable parent types and animations when mirroring
 
-Parent types and blockbench animations mess with how animation mirror handles animating your avatar, so they need to be disabled when animation mirror is the `COPYING` state (mirroring is referred to as "copying" internally).
+Parent types and blockbench animations mess with how Animation Mirror handles animating your avatar, so they need to be disabled when Animation Mirror is the `COPYING` state (mirroring is referred to as "copying" internally).
 
 To aid with this, you can use the `state_change` event like so:
 
@@ -405,7 +405,7 @@ end
 
 # Step 7: "Mirror me" indicator
 
-You may notice that animation mirror shows a little piece of text saying "Mirror me" next to anyone who's mirrorable.
+You may notice that Animation Mirror shows a little piece of text saying "Mirror me" next to anyone who's mirrorable.
 
 You can disable this by deleting the file `animation_mirror\player_tracker\mirror_me_text.lua`. If you don't plan to implement any system to indicate who's mirrorable, delete the `animation_mirror\player_tracker` folder. If you do want to implement your own indicator, see the [player tracker](player_tracker.md) guide.
 
