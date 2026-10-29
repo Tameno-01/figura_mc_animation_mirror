@@ -2,7 +2,7 @@
 
 A Figura API that lets people mirror each other's animations! It features **rig retargeting**, so it should work across all humanoid rigs!
 
-The whole point of this API is that it does not require you have someone's animations in your avatar to be able to mirror them, but it does require you both have animation mirror in your avatars to work.
+The whole point of this API is that it does not require you have someone's animations in your avatar to be able to mirror them, but it does require you both have Animation Mirror in your avatars to work.
 
 ![Two Figura avatars doing a dance in synch](docs/showcase.webp)
 

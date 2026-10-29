@@ -10,7 +10,7 @@ local AnimationMirror = require("animation_mirror/core")
 
 | Parameter | Type | Description
 | - | - | - |
-| `body` | table | The body animation mirror will use. |
+| `body` | table | The body Animation Mmirror will use. |
 
 Sets the body Animation Mirror will use. See the [how to use](how_to_use.md) guide for more info.
 
@@ -52,7 +52,7 @@ Stops Animation Mirror, making you no longer mirrorable nor mirroring anyone. Th
 
 ## `AnimationMirror.get_current_state()`
 
-Returns a string that can be either `SOURCE`, `COPYING` or `OFF`, which represents the state animation mirror is in.
+Returns a string that can be either `SOURCE`, `COPYING` or `OFF`, which represents the state Animation Mirror is in.
 
 For more info, see, `AnimationMirror.begin_being_source()`, `AnimationMirror.begin_copying()` and `AnimationMirror.stop()`.
 

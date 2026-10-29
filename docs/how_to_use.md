@@ -6,9 +6,9 @@ I know it's long, but please read try to read this whole guide, it should cover 
 
 # Step 0: Rig Requirements
 
-Sadly, not all rigs are compatible with Animation Mirror. For starters, they all have to be humanoid, the more your rig deviates from a human, the more likely animation mirror does not support it.
+Sadly, not all rigs are compatible with Animation Mirror. For starters, they all have to be humanoid, the more your rig deviates from a human, the more likely Animation Mirror does not support it.
 
-**Things animation mirror does support:**
+**Things Animation Mirror does support:**
 
 - Vanilla-styled rigs (no elbows, no hands, no knees, no feet and no articulation for the torso)
 - Fully articulated rigs (with elbows, hands, knees, feet and a torso with any number of spine joints)
