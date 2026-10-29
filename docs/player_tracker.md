@@ -28,7 +28,7 @@ An active player is any player who:
 
 PlayerTracker will call `create_func` when a player becomes active, passing their UUID as the first and only parameter, this function can return anything but `nil`, tho it is recommended to make it return a table.
 
-While a player is active, PlayerTracker will call `rended_func` every frame and `tick_func` ever tick (if present), passing in whatever `create_func` returned as the first parameter.
+While a player is active, PlayerTracker will call `rended_func` every frame (if present) and `tick_func` ever tick (if present), passing in whatever `create_func` returned as the first parameter, and in the case of `rended_func`, delta (see base Figura's render events to know what delta means) will be passed as the second parameter.
 
 When a player stops being active, and `delete_func` is present, PlayerTracker tracker will call `delete_func` with whatever `create_func` returned for that player as the first parameter.
 
