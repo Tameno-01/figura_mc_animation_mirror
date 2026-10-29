@@ -159,7 +159,7 @@ local function begin_copying(uuid)
 	end
 	avatar:store("AnimationMirror_source", uuid)
 	if prev_source_player_uuid ~= nil then
-		api.events.source_change:emit()
+		api.events.source_change:emit(source_player_uuid, prev_source_player_uuid)
 	end
 	return true
 end

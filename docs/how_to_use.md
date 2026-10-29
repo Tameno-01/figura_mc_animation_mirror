@@ -43,12 +43,12 @@ Depending on which style of rig each part has, what's considered a valid rest po
 **Arms:**
 
 - [Vanilla](arm/vanilla_rig_requirements.md) (Single joint)
-- [Rigged](arm/rigged_rig_requirements.md) (With and elbow joint and an optional hand)
+- [Rigged](arm/rigged_rig_requirements.md) (With an elbow joint and an optional hand)
 
 **Legs:**
 
 - [Vanilla](leg/vanilla_rig_requirements.md) (Single joint)
-- [Rigged](leg/rigged_rig_requirements.md) (With and knee joint and an optional foot)
+- [Rigged](leg/rigged_rig_requirements.md) (With a knee joint and an optional foot)
 - [Digitigrade](leg/digitigarde_rig_requirements.md) (Animal legs)
 
 ## Step 0.3: Set rotations back to what they were
@@ -240,6 +240,27 @@ It is worth noting that calling `AnimationMirror.begin_being_source()` will stop
 
 You probably want a more complicated system than this, but implementing it highly depends on how your avatar is set up. This example should be enough to explain how mirroring works.
 
+# Step 5: Choosing who you want to mirror you
+
+Here's how you can, for example, have a uuid-based blacklist:
+
+```lua
+local blacklist = {
+	["some-bad-persons-uuid"] = true,
+	["some-other-persons-uuid"] = true,
+}
+
+AnimationMirror.set_allow_copy_func(function(uuid)
+	return not blacklist[uuid]
+)
+```
+
+As you can see, `AnimationMirror.set_allow_copy_func()` takes in a function, which takes in a uuid and returns either `true` or `false`. When someone tries to mirror you, Animation Mirror will run this function with their uuid. If it returns `true`, that person will be able to mirror you, if it returns `false`, they won't.
+
+This function may also be run if people check wether you're mirrorable by them using `AnimationMirror.can_copy()`.
+
+The default behavior is to allow everyone to mirror you.
+
 # Example script
 
 Here's an example script with everything we've done so far, this is how one could go about implementing a vanilla-style avatar, the changes needed for other rigs should be minor, but note that this is just an example script with functionality missing.
@@ -253,6 +274,8 @@ local LegMaker = require("animation_mirror/body_maker/leg/vanilla")
 local BodyMaker = require("animation_mirror/body_maker/core")
 local AnimationMirrorPlayerPicker = require("animation_mirror/player_picker")
 
+-- You technically don't need to do this,
+-- but it makes getting parts easier and cleaner.
 local model = models.model
 local root = model.root
 local head = root.Head
@@ -304,6 +327,15 @@ local body = BodyMaker.make(
 )
 
 AnimationMirror.set_body(body)
+
+local blacklist = {
+	["some-bad-persons-uuid"] = true,
+	["some-other-persons-uuid"] = true,
+}
+
+AnimationMirror.set_allow_copy_func(function(uuid)
+	return not blacklist[uuid]
+)
 
 keybinds:newKeybind(
 	"pick_player",
@@ -365,8 +397,12 @@ function pings.stop_animation_mirror()
 end
 ```
 
-# Step 5: "Mirror me" indicator
+# Step 6: "Mirror me" indicator
 
 You may notice that animation mirror shows a little piece of text saying "Mirror me" next to anyone who's mirrorable.
 
-You can disable this by deleting the file `animation_mirror\player_tracker\mirror_me_text.lua`. If you don't plan to implement any system to indicate who's mirrorable, delete the `animation_mirror\player_tracker` folder.
+You can disable this by deleting the file `animation_mirror\player_tracker\mirror_me_text.lua`. If you don't plan to implement any system to indicate who's mirrorable, delete the `animation_mirror\player_tracker` folder. If you do want to implement your own indicator, see the [player tracker](player_tracker.md) guide.
+
+# Further reading
+
+This guide covers all fundamental features of Animation Mirror, for more features and precise descriptions of all the functions seen in this guide, go [here](reference_hub.md).
