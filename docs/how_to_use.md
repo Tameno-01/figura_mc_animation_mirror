@@ -341,7 +341,7 @@ local blacklist = {
 
 AnimationMirror.set_allow_copy_func(function(uuid)
 	return not blacklist[uuid]
-)
+end)
 
 keybinds:newKeybind(
 	"pick_player",
