@@ -22,6 +22,6 @@ This API has many files. While a lot of them are optional, avatar space is a gen
 
 # Installation and Usage
 
-[General overview](docs/how_to_use.md) (Start here)
+[How to use](docs/how_to_use.md) (Start here)
 
 [Functions, events and other misc things](docs/reference_hub.md) (Full documentation)
