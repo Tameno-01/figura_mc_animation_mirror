@@ -167,7 +167,7 @@ function pings.stop_emote()
 end
 ```
 
-You emote system is probably more complicated than this, but this example should suffice for explaining how being mirrorable works.
+Your emote system is probably more complicated than this, but this example should suffice for explaining how being mirrorable works.
 
 # Step 5: Implement mirroring other people
 
@@ -216,7 +216,7 @@ local uuid = PlayerPicker.pick_player()
 
 You can find more info on PlayerPicker [here](player_picker.md). If you don't need this utility and have your own system for getting people's uuids, you can delete the `animation_mirror/player_picker.lua` file.
 
-Here's how you can, for example, bind mirroring whoever your looking at to the X key:
+Here's how you can, for example, bind mirroring whoever you're looking at to the X key:
 
 ```lua
 keybinds:newKeybind(
