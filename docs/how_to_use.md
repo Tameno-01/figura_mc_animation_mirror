@@ -390,10 +390,6 @@ function pings.stop_emote()
 	AnimationMirror:stop()
 end
 
-function pings.start_source()
-	AnimationMirror.begin_being_source()
-end
-
 function pings.begin_copying(uuid)
 	AnimationMirror.begin_copying(uuid)
 end
