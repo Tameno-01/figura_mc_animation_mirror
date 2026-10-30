@@ -40,7 +40,7 @@ You can use `remove()` to unregister functions from events.
 
 ```lua
 local function state_change_func(new, old)
-	print("this will never print.")
+	print("This will never print.")
 end
 
 AnimationMirror.events.state_change.register(state_change_func)

@@ -17,4 +17,4 @@ local animation_mirror_torso = TorsoMaker.make(
 
 Replace `hips`, `spine1`, `spine2`, etc. with all the joints of your torso (for example, `model.models.root.Hips`). They should be ordered from parent to child.
 
-Replace `top` with your head `ModelPart`, or if it's not present, your neck. Alternatively, you can use an empty group places at the very top of your torso. 
+Replace `top` with your neck `ModelPart`, or if it's not present, your head. Alternatively, you can use an empty group placed at the very top of your torso.

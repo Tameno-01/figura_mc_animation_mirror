@@ -1,6 +1,6 @@
 # Player Tracker
 
-If you want to implement your own indicator for who's mirrorable, you first need to require the PlayerTracker:
+If you want to implement your own indicators for who's mirrorable, you first need to require the PlayerTracker:
 
 ```lua
 local PlayerTracker = require("animation_mirror/player_tracker/core")

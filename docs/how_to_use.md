@@ -20,7 +20,7 @@ Additionally, it is worth noting that all of the above can be mixed and matched 
 
 ## Step 0.1: Temporarily set all joints's rotation to 0
 
-Animation Mirror does not care what rotations joints have in blockbench, however, the **rest pose** of your model does matter. To see this pose and verify it is supported, set their rotation to 0. This should be the state they're all already in.
+Animation Mirror does not care what rotations joints have in blockbench, however, the **rest pose** of your model does matter. To see this pose and verify it is supported, set all joints's rotation to 0. This should be the state they're all already in.
 
 ![A Blockbench screenshot showing the rotation of a group set to 0, 0, 0](0_rot.png)
 
@@ -163,7 +163,7 @@ end
 
 function pings.stop_emote()
 	animations.model.my_cool_emote:stop()
-	AnimationMirror:stop()
+	AnimationMirror.stop()
 end
 ```
 
@@ -175,7 +175,7 @@ Mirroring other people is significantly more complex than being mirrorable.
 
 ## Step 5.1: Disable parent types and animations when mirroring
 
-Parent types and blockbench animations mess with how Animation Mirror handles animating your avatar, so they need to be disabled when Animation Mirror is the `COPYING` state (mirroring is referred to as "copying" internally).
+Parent types and blockbench animations mess with how Animation Mirror handles animating your avatar, so they need to be disabled when Animation Mirror is in the `COPYING` state (mirroring is referred to as "copying" internally).
 
 To aid with this, you can use the `state_change` event like so:
 
@@ -189,6 +189,8 @@ function AnimationMirror.events.state_change(new, old)
 	end
 end
 ```
+
+You can find more info on events [here](core_events.md)
 
 You can use `ModelPart:setParentType()` to disable parent types.
 
@@ -236,7 +238,7 @@ function pings.begin_copying(uuid)
 end
 
 function pings.stop_animation_mirror()
-	AnimationMirror:stop()
+	AnimationMirror.stop()
 end
 ```
 
@@ -248,7 +250,7 @@ You probably want a more complicated system than this, but implementing it highl
 
 # Step 6: Choosing who you want to mirror you
 
-Here's how you can, for example, have a uuid-based blacklist:
+Here's how you can, for example, have a UUID-based blacklist:
 
 ```lua
 local blacklist = {
@@ -261,7 +263,7 @@ AnimationMirror.set_allow_copy_func(function(uuid)
 end)
 ```
 
-As you can see, `AnimationMirror.set_allow_copy_func()` takes in a function, which takes in a uuid and returns either `true` or `false`. When someone tries to mirror you, Animation Mirror will run this function with their uuid. If it returns `true`, that person will be able to mirror you, if it returns `false`, they won't.
+As you can see, `AnimationMirror.set_allow_copy_func()` takes in a function, which takes in a UUID and returns either `true` or `false`. When someone tries to mirror you, Animation Mirror will run this function with their UUID. If it returns `true`, that person will be able to mirror you, if it returns `false`, they won't.
 
 This function may also be run if people check wether you're mirrorable by them using `AnimationMirror.can_copy()`.
 
@@ -269,7 +271,7 @@ The default behavior is to allow everyone to mirror you.
 
 # Example script
 
-Here's an example script with everything we've done so far, this is how one could go about implementing a vanilla-style avatar, the changes needed for other rigs should be minor, but note that this is just an example script with functionality missing.
+Here's an example script with everything we've done so far, this is how one could go about implementing a vanilla-style avatar. The changes needed for other rigs should be minor, but note that this is just an example script with functionality missing.
 
 ```lua
 local AnimationMirror = require("animation_mirror/core")
@@ -387,7 +389,7 @@ end
 
 function pings.stop_emote()
 	animations.model.my_cool_emote:stop()
-	AnimationMirror:stop()
+	AnimationMirror.stop()
 end
 
 function pings.begin_copying(uuid)
@@ -395,7 +397,7 @@ function pings.begin_copying(uuid)
 end
 
 function pings.stop_animation_mirror()
-	AnimationMirror:stop()
+	AnimationMirror.stop()
 end
 ```
 
