@@ -1,6 +1,6 @@
 # How to use
 
-I know it's long, but please read try to read this whole guide, it should cover everything.
+I know it's long, but please try to read this whole guide, it should cover everything.
 
 **Installation** is covered in step 1.
 
