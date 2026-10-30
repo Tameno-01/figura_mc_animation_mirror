@@ -48,7 +48,7 @@ AnimationMirror.events.state_change.register(state_change_func)
 AnimationMirror.events.state_change.remove(state_change_func)
 ```
 
-**NOTE:** Never have the same function registered to the same event more then once.
+**NOTE:** Never have the same function registered to the same event more than once.
 
 ## `state_change(new, old)`
 
@@ -74,4 +74,4 @@ This event gets fired when you change who you're mirroring.
 
 `new` and `old` can never be the same. If you try to mirror someone you're already mirroring, this event won't fire.
 
-`new` and `old` can never be the `nil`. This event does not fire is you start mirroring someone without already in the `COPYING` state, nor when stopping Animation Mirror or switching to the `SOURCE` state.
+`new` and `old` can never be the `nil`. This event does not fire is you start mirroring someone without already being in the `COPYING` state, nor when stopping Animation Mirror or switching to the `SOURCE` state.
