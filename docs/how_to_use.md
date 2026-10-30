@@ -224,7 +224,7 @@ keybinds:newKeybind(
 	if AnimationMirror.get_current_state() == "COPYING" then
 		pings.stop_animation_mirror()
 	else
-	local uuid = PlayerPicker.pick_player()
+		local uuid = PlayerPicker.pick_player()
 		if uuid ~= nil then
 			pings.begin_copying(uuid)
 		end
@@ -350,7 +350,7 @@ keybinds:newKeybind(
 	if AnimationMirror.get_current_state() == "COPYING" then
 		pings.stop_animation_mirror()
 	else
-	local uuid = PlayerPicker.pick_player()
+		local uuid = PlayerPicker.pick_player()
 		if uuid ~= nil then
 			pings.begin_copying(uuid)
 		end
