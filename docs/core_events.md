@@ -28,10 +28,10 @@ function AnimationMirror.events.state_change(new, old)
 end
 ```
 
-Alternatively, you can use `register()`, which can also be used several times for the same event.
+Alternatively, you can use `register()`, which can also be used several times for the same event. Note the use of `:`.
 
 ```lua
-AnimationMirror.events.state_change.register(func(new, old)
+AnimationMirror.events.state_change:register(func(new, old)
 	print("This will print when the event fires.")
 end)
 ```
@@ -43,9 +43,9 @@ local function state_change_func(new, old)
 	print("This will never print.")
 end
 
-AnimationMirror.events.state_change.register(state_change_func)
+AnimationMirror.events.state_change:register(state_change_func)
 
-AnimationMirror.events.state_change.remove(state_change_func)
+AnimationMirror.events.state_change:remove(state_change_func)
 ```
 
 **NOTE:** Never have the same function registered to the same event more than once.
