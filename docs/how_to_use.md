@@ -265,7 +265,7 @@ end)
 
 As you can see, `AnimationMirror.set_allow_copy_func()` takes in a function, which takes in a UUID and returns either `true` or `false`. When someone tries to mirror you, Animation Mirror will run this function with their UUID. If it returns `true`, that person will be able to mirror you, if it returns `false`, they won't.
 
-This function may also be run if people check wether you're mirrorable by them using `AnimationMirror.can_copy()`.
+This function may also be ran if people check wether you're mirrorable by them using `AnimationMirror.can_copy()`.
 
 The default behavior is to allow everyone to mirror you.
 

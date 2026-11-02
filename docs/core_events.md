@@ -31,7 +31,7 @@ end
 Alternatively, you can use `register()`, which can also be used several times for the same event. Note the use of `:`.
 
 ```lua
-AnimationMirror.events.state_change:register(func(new, old)
+AnimationMirror.events.state_change:register(function(new, old)
 	print("This will print when the event fires.")
 end)
 ```

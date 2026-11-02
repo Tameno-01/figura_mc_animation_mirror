@@ -24,7 +24,7 @@ This function should only be called once, before any calls to `AnimationMirror.b
 
 When someone tries to mirror you, Animation Mirror will run `func` with their UUID as its first parameter. If it returns `true`, that person will be able to mirror you, if it returns `false`, they won't.
 
-This function may also be run if people check wether you're mirrorable by them using `AnimationMirror.can_copy()`.
+This function may also be ran if people check wether you're mirrorable by them using `AnimationMirror.can_copy()`.
 
 If this function never gets called, the default behavior is to allow everyone to mirror you.
 
