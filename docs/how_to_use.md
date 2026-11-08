@@ -137,6 +137,8 @@ Note the last 2 `nil` parameters, they're optional, but very important.
 
 If you look at the `animation_mirror/body_maker` folder, you will see sub-folders for all the body parts Animation Mirror considers, if you look into those folders, you'll notice that for each one you're only requiring one of the files in it. You can delete all the other files to save avatar space.
 
+**IMPORTANT:** This step only applies to files in the `arm`, `head`, `leg` and `torso` folders, do NOT delete files outside of those folders!
+
 # Step 4: Hook Animation Mirror into your emotes system
 
 Being mirrorable is essentially a global switch you turn on at will, this switch is NOT automatically pinged. I know this is manual, but i can't think of a better way for the API to work.
