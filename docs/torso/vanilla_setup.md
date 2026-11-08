@@ -12,7 +12,7 @@ Then, make the torso like so:
 local animation_mirror_torso = TorsoMaker.make(
 	torso,
 	bottom_pivot, -- bool, mandatory
-	nil, --height (number, defaults to 12)
+	nil --height (number, defaults to 12)
 )
 ```
 
